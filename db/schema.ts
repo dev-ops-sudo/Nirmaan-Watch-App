@@ -1,0 +1,7 @@
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+export const projects = sqliteTable('projects', { id: text('id').primaryKey(), payload: text('payload').notNull(), updatedAt: text('updated_at').notNull() });
+export const settings = sqliteTable('settings', { key: text('key').primaryKey(), value: text('value').notNull() });
+export const feedback = sqliteTable('feedback', { id: text('id').primaryKey(), projectId: text('project_id').notNull(), author: text('author').notNull(), name: text('name').notNull(), rating: integer('rating').notNull(), category: text('category').notNull(), message: text('message').notNull(), status: text('status').notNull(), response: text('response').notNull().default(''), createdAt: text('created_at').notNull() });
+export const reviews = sqliteTable('reviews', { id: text('id').primaryKey(), projectId: text('project_id').notNull(), status: text('status').notNull(), note: text('note').notNull(), actor: text('actor').notNull(), updatedAt: text('updated_at').notNull() });
+export const audit = sqliteTable('audit', { id: text('id').primaryKey(), actor: text('actor').notNull(), action: text('action').notNull(), detail: text('detail').notNull(), createdAt: text('created_at').notNull() });
+export const documents = sqliteTable('documents', { id: text('id').primaryKey(), projectId: text('project_id').notNull(), name: text('name').notNull(), type: text('type').notNull(), size: integer('size').notNull(), uploader: text('uploader').notNull(), createdAt: text('created_at').notNull() });
