@@ -80,3 +80,11 @@ The initial deployment is private to the owner. The first authenticated visitor 
 The basemap is © OpenStreetMap contributors: https://www.openstreetmap.org/copyright. Browser tile requests use standard caching and visible attribution. Only visible viewport tiles are requested; there is no bulk or offline downloading. Tile policy: https://operations.osmfoundation.org/policies/tiles/. The basemap is an external best-effort service and the map displays a connection notice if tiles fail. Production usage should select a suitable tile provider for the expected traffic.
 
 No third-party MPLADS dataset has been copied into this project. All initial project/contractor names and financial records are synthetic demonstrations created for Code Crew.
+
+## Bilingual civic design
+
+The interface includes Hindi–English navigation and headings, restrained tricolour accents, and a public-works banner inspired by the supplied reference. It is explicitly labelled as the Code Crew SIH prototype. This is bilingual supporting copy, not a full language-switching translation.
+
+The project-owned transparent asset `public/images/public-works-montage.png` (2172 × 724, RGBA) was generated using the built-in image-generation tool. Prompt: realistic editorial infrastructure montage for an Indian public-works monitoring prototype, viaduct, spillway, institutional building, two helmeted Indian engineers, muted daylight and teal/navy tones, subjects on the right, transparent left third and feathered edges, no logos, flags, emblems, or text. The artwork is illustrative and is not evidence of a real project.
+
+Scroll reveals use IntersectionObserver; all content remains visible if it is unavailable. Buttons have restrained hover/press effects and map navigation retains its own interaction behaviour. Smooth scrolling and motion are disabled when the visitor requests reduced motion.
