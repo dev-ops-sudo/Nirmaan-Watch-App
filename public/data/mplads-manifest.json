@@ -1,0 +1,251 @@
+{
+  "source": "MPLADS_STATEWISE_ALL_INDIA.zip",
+  "columns": [
+    "WORK_ID",
+    "MP_NAME",
+    "HOUSE",
+    "STATE",
+    "CONSTITUENCY",
+    "CITY",
+    "WARD",
+    "BLOCK",
+    "VILLAGE",
+    "WORK_CATEGORY",
+    "WORK_DESCRIPTION",
+    "IMPLEMENTING_AUTHORITY",
+    "RECOMMENDED_DATE",
+    "IDA_APPROVAL",
+    "ALLOCATION_AMOUNT",
+    "STATUS"
+  ],
+  "recordCount": 60359,
+  "files": [
+    {
+      "name": "MPLADS_ANDAMAN_AND_NICOBAR_ISLANDS.csv",
+      "state": "Andaman And Nicobar Islands",
+      "rows": 59,
+      "sha256": "02d55d178df7d6f9252766b5a049d48823bd6ed7f1b3ee20439837f59608ea3a"
+    },
+    {
+      "name": "MPLADS_ANDHRA_PRADESH.csv",
+      "state": "Andhra Pradesh",
+      "rows": 3944,
+      "sha256": "2c51d65c946489fa9219cb0077c656d07654b8262e8fb83c873566ee4953f943"
+    },
+    {
+      "name": "MPLADS_ARUNACHAL_PRADESH.csv",
+      "state": "Arunachal Pradesh",
+      "rows": 332,
+      "sha256": "2e1216ef06253635bc3c203924f67113e694b523e0a833fdfaeb7249d5944cee"
+    },
+    {
+      "name": "MPLADS_ASSAM.csv",
+      "state": "Assam",
+      "rows": 1735,
+      "sha256": "7daccc88b83e35c277ba0cd18373e14a8524cab257d564fa8dfb833cc6cb5fbf"
+    },
+    {
+      "name": "MPLADS_BIHAR.csv",
+      "state": "Bihar",
+      "rows": 5706,
+      "sha256": "37b94ccadad6b9bc573550fd1594affb8d1ec6c98c7eb936952d96bf945c5ee7"
+    },
+    {
+      "name": "MPLADS_CHANDIGARH.csv",
+      "state": "Chandigarh",
+      "rows": 0,
+      "sha256": "3abf04a0d117fe0033c5eef83fef98660ea3bf413c4ec398a75fd182b3a72328"
+    },
+    {
+      "name": "MPLADS_CHHATTISGARH.csv",
+      "state": "Chhattisgarh",
+      "rows": 1594,
+      "sha256": "2095cd12d8cb027cbb372aa7fa12f24032d77c1a723ded449aaaeed127a197c6"
+    },
+    {
+      "name": "MPLADS_DADRA_AND_NAGAR_HAVELI_AND_DAMAN_AND_DIU.csv",
+      "state": "Dadra And Nagar Haveli And Daman And Diu",
+      "rows": 0,
+      "sha256": "3abf04a0d117fe0033c5eef83fef98660ea3bf413c4ec398a75fd182b3a72328"
+    },
+    {
+      "name": "MPLADS_DELHI.csv",
+      "state": "Delhi",
+      "rows": 72,
+      "sha256": "5dc3c688171f55430e8ccb0d80c8a0436deeb44466d45a38cc12a792d4ffad99"
+    },
+    {
+      "name": "MPLADS_GOA.csv",
+      "state": "Goa",
+      "rows": 172,
+      "sha256": "2b62e55a7edc6b9d836a1a3e69baa6364bbfea8c54cf195408b8560d11909b04"
+    },
+    {
+      "name": "MPLADS_GUJARAT.csv",
+      "state": "Gujarat",
+      "rows": 1754,
+      "sha256": "ad538e901acc640484088afbf2218a7ca5799df3bfdbec214a60eb48831f91de"
+    },
+    {
+      "name": "MPLADS_HARYANA.csv",
+      "state": "Haryana",
+      "rows": 1906,
+      "sha256": "2fdba8ac75b072a2871053a5cf0acf45fe583e20ae42f550fbae71088668b9aa"
+    },
+    {
+      "name": "MPLADS_HIMACHAL_PRADESH.csv",
+      "state": "Himachal Pradesh",
+      "rows": 1240,
+      "sha256": "5e6535c2a9a4a75218e034ac60b387152a82f2a3992e060b2fa5fad865409989"
+    },
+    {
+      "name": "MPLADS_JAMMU_AND_KASHMIR.csv",
+      "state": "Jammu And Kashmir",
+      "rows": 852,
+      "sha256": "a7f0ccfc0713bee445fec392c82afde115680beb6eada71aaaa16ef2b4817573"
+    },
+    {
+      "name": "MPLADS_JHARKHAND.csv",
+      "state": "Jharkhand",
+      "rows": 2259,
+      "sha256": "ae88254225e96bda95b427cd17f54732445ce7a6c985e236615db243740606da"
+    },
+    {
+      "name": "MPLADS_KARNATAKA.csv",
+      "state": "Karnataka",
+      "rows": 3906,
+      "sha256": "653eaf7630fefdec853147d501efbc4e4b7f8e1aba6663a711d11cfdae3c48eb"
+    },
+    {
+      "name": "MPLADS_KERALA.csv",
+      "state": "Kerala",
+      "rows": 584,
+      "sha256": "7448234ecf003f179295692f5f0bfc909d9ace1939f0f5b2c7e810da1a21e467"
+    },
+    {
+      "name": "MPLADS_LADAKH.csv",
+      "state": "Ladakh",
+      "rows": 0,
+      "sha256": "3abf04a0d117fe0033c5eef83fef98660ea3bf413c4ec398a75fd182b3a72328"
+    },
+    {
+      "name": "MPLADS_LAKSHADWEEP.csv",
+      "state": "Lakshadweep",
+      "rows": 42,
+      "sha256": "83243aaabf6fe057dfaf165dabd805c9435330fcc920ee1ec80c1345a6a6128b"
+    },
+    {
+      "name": "MPLADS_MADHYA_PRADESH.csv",
+      "state": "Madhya Pradesh",
+      "rows": 2504,
+      "sha256": "f5800d1d4f7e829fc6f7d27a9cb47422f03a92b874c4c9d29007a44ff9ee2875"
+    },
+    {
+      "name": "MPLADS_MAHARASHTRA.csv",
+      "state": "Maharashtra",
+      "rows": 816,
+      "sha256": "42c80482af732286244e1f4762b9082c11c7a1fcff72c5986d38c5ccab446b47"
+    },
+    {
+      "name": "MPLADS_MANIPUR.csv",
+      "state": "Manipur",
+      "rows": 73,
+      "sha256": "f2ff1c66929d395d83a00755ccdf687f627bad6b53e90e3323da5afb3cac5f49"
+    },
+    {
+      "name": "MPLADS_MEGHALAYA.csv",
+      "state": "Meghalaya",
+      "rows": 266,
+      "sha256": "381687b8ddac4ba2a3bf818e4f08e5fc895709b98ab6290cb5b68fa7f082169f"
+    },
+    {
+      "name": "MPLADS_MIZORAM.csv",
+      "state": "Mizoram",
+      "rows": 119,
+      "sha256": "56027875250ddb30391665a8f6aadbe116cfecff2b96d25a5c55197911b43eb7"
+    },
+    {
+      "name": "MPLADS_NAGALAND.csv",
+      "state": "Nagaland",
+      "rows": 26,
+      "sha256": "3d6ed69c26636193654872e471121cd72e5c62acecaf3931253fed823387f1cf"
+    },
+    {
+      "name": "MPLADS_ODISHA.csv",
+      "state": "Odisha",
+      "rows": 4832,
+      "sha256": "3752b58e7eff97fc3b3231ca70e298e96d33ca1c79225ff568f2149678c31da4"
+    },
+    {
+      "name": "MPLADS_PUDUCHERRY.csv",
+      "state": "Puducherry",
+      "rows": 38,
+      "sha256": "0b1a62e464b289b02a53afd2ec46496bfd88f18956248aa61229ab52fe40b5e3"
+    },
+    {
+      "name": "MPLADS_PUNJAB.csv",
+      "state": "Punjab",
+      "rows": 3324,
+      "sha256": "827869d45f8d390f5b046fde30d4e314fb7a8e32fc0c42364089a610ecda0a67"
+    },
+    {
+      "name": "MPLADS_RAJASTHAN.csv",
+      "state": "Rajasthan",
+      "rows": 3859,
+      "sha256": "24e017f686c05d3522ea32210d34fae0121084d12385d76b91c52784400e3797"
+    },
+    {
+      "name": "MPLADS_SIKKIM.csv",
+      "state": "Sikkim",
+      "rows": 112,
+      "sha256": "c9fcb6f907663915839970ba960d8830c01826c97a23062cc8ebfd8798c59204"
+    },
+    {
+      "name": "MPLADS_TAMIL_NADU.csv",
+      "state": "Tamil Nadu",
+      "rows": 4576,
+      "sha256": "f64c6ddf42dc89f0bd6460b91449e3b90e5bd11cfeb738d7ff29ea5995bc98c0"
+    },
+    {
+      "name": "MPLADS_TELANGANA.csv",
+      "state": "Telangana",
+      "rows": 2526,
+      "sha256": "b67d858712df654f1739e979db194dfd87055dc9129cef48cc089f8f184f9755"
+    },
+    {
+      "name": "MPLADS_TRIPURA.csv",
+      "state": "Tripura",
+      "rows": 165,
+      "sha256": "0b24003f010d1819016d9d2d64cc78195584462ee9b5fe6e89f1dc0aea912aae"
+    },
+    {
+      "name": "MPLADS_UTTAR_PRADESH.csv",
+      "state": "Uttar Pradesh",
+      "rows": 6616,
+      "sha256": "fff3b81e8a6475d1394f7879c124456b790a434ad06835a18966808005d914c8"
+    },
+    {
+      "name": "MPLADS_UTTARAKHAND.csv",
+      "state": "Uttarakhand",
+      "rows": 1824,
+      "sha256": "921e9142bc3a853ae68d28e091e976c2b6e941cd6b8e2d78de871a7508a6ab2b"
+    },
+    {
+      "name": "MPLADS_WEST_BENGAL.csv",
+      "state": "West Bengal",
+      "rows": 2526,
+      "sha256": "267a16ac6f46626d4f5dd5fe2d6b6a1e7611ac1d1dda2f7cfe6c745f71ae15ed"
+    }
+  ],
+  "allocationTotal": "34982467506",
+  "statusCounts": {
+    "Unsanctioned": 50888,
+    "Ongoing": 629,
+    "Sanctioned": 6528,
+    "Completed": 1503,
+    "Not reported": 811
+  },
+  "recommendedFrom": "2023-04-26",
+  "recommendedTo": "2024-03-04",
+  "missingStatus": 811
+}

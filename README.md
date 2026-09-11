@@ -2,7 +2,32 @@
 
 A full-stack MPLADS monitoring and anomaly-review application for SIH26102. It combines a geographic project register with budgets, contractors, citizen reports, documentary evidence, and explainable screening.
 
-## Working features
+## Complete MPLADS dataset integration
+
+The default application opens the supplied all-India snapshot: **60,359 unique works across all 36 CSV files**, with **?34,982,467,506 (?3,498.25 crore)** in recorded allocations. Recommendation dates run from **2023-04-26 to 2024-03-04**. All 16 original columns, blank values, source filenames and CSV row numbers are preserved. Three files contain headers only.
+
+The full-data view supports state, status, approval, category, house, MP, date and free-text filters; sorted and paginated work browsing; complete work details; state/category/MP/month/approval reports; implementing-authority exploration; and CSV/JSON exports. Only 50 table rows render per page, while filtering and exports cover the entire selection. Whitespace is trimmed in display/grouping fields while original values remain intact for source details and exports.
+
+`ALLOCATION_AMOUNT` is displayed as recorded allocation in INR. It is not substituted for sanction, release or expenditure. Recommendation dates are not treated as start dates or last updates. STATE can describe MP affiliation rather than the actual work location. No coordinates, contractor assignments, physical progress, payment registers or spending figures are invented. The original analytical and editable workspace remains available through **Demo & editable workspace**, with its synthetic/imported records separate from this read-only source snapshot. Source works are not automatically inserted into that workspace's stricter operational schema.
+
+### Start on Windows
+
+Double-click **START-NIRMAAN.cmd** and open the Local URL printed in the window. Keep the window open during the presentation. Node.js 22.13+ is required; dependencies are already installed in this working folder. The bundled source explorer works locally without a sign-in or external dataset service. The existing authenticated editing, uploads and feedback workflows require the hosted Sites environment.
+
+```text
+npm ci
+npm run dev
+npm run build
+npm run test:mplads
+npm run test:domain
+npm run test:api
+```
+
+The data is prebuilt in `public/data/`. To replace the source snapshot, place all 36 CSVs in `data/source/`, then run `npm run data:prepare` (Python 3 required only for regeneration). The importer rejects malformed columns, missing/duplicate IDs and invalid amounts. `npm run test:mplads` independently parses and reconciles every source field, checks totals and exercises filtering and exports. Source checksums and file counts are in `public/data/mplads-manifest.json`.
+
+See **PRESENTATION-GUIDE.md** for a short demonstration flow and exact source totals.
+
+## Original editable workspace features
 
 - Interactive OpenStreetMap map with project markers, pan/zoom, fit-to-projects, keyboard controls, filters, and explicit handling of missing coordinates.
 - Project profiles with dates, ownership, source references, physical progress, milestones, and payment registers.
@@ -22,7 +47,7 @@ React 19, TypeScript, Vinext/Vite, Shadcn/Radix accessible primitives, Lucide ic
 
 ## Running and validating
 
-Node 22.13+ and the Linux commands used by the supplied scripts are required.
+Node 22.13+ is required. Development, build, start and lint commands support Windows. The original install:ci and database-generation scripts use Bash.
 
 ```bash
 npm run install:ci
@@ -42,7 +67,7 @@ The Data workspace includes an empty CSV template, a labelled JSON structure exa
 
 Payments and milestones are arrays available through JSON. A blank CSV template does not contain their columns. The JSON example contains fictional values and must be replaced with source data before real use. Imports support up to 500 rows and 2 MB per request; workspace capacity is 5,000 projects. Initial scope is five construction categories (Roads, Education, Water, Health, Community); extend the schema and UI together for other types of MPLADS work.
 
-Your dataset and supporting documents are still required. There is no connected official government feed, automatic geocoding, OCR, or satellite-based construction-progress inference. Manual refresh/import reflects source updates; the interface does not imply live ground observation.
+Detailed operational records and supporting documents are still required for the editable workspace. There is no connected official government feed, automatic geocoding, OCR, or satellite-based construction-progress inference. Manual refresh/import reflects source updates; the interface does not imply live ground observation.
 
 ## Detection and interpretation
 
@@ -79,7 +104,7 @@ The initial deployment is private to the owner. The first authenticated visitor 
 
 The basemap is © OpenStreetMap contributors: https://www.openstreetmap.org/copyright. Browser tile requests use standard caching and visible attribution. Only visible viewport tiles are requested; there is no bulk or offline downloading. Tile policy: https://operations.osmfoundation.org/policies/tiles/. The basemap is an external best-effort service and the map displays a connection notice if tiles fail. Production usage should select a suitable tile provider for the expected traffic.
 
-No third-party MPLADS dataset has been copied into this project. All initial project/contractor names and financial records are synthetic demonstrations created for Code Crew.
+The user-supplied MPLADS_STATEWISE_ALL_INDIA.zip is integrated into the default source explorer, with originals in data/source. Its records have not been independently verified. The separate demo workspace retains synthetic demonstrations created for Code Crew.
 
 ## Bilingual civic design
 
@@ -88,3 +113,11 @@ The interface includes Hindi–English navigation and headings, restrained trico
 The project-owned transparent asset `public/images/public-works-montage.png` (2172 × 724, RGBA) was generated using the built-in image-generation tool. Prompt: realistic editorial infrastructure montage for an Indian public-works monitoring prototype, viaduct, spillway, institutional building, two helmeted Indian engineers, muted daylight and teal/navy tones, subjects on the right, transparent left third and feathered edges, no logos, flags, emblems, or text. The artwork is illustrative and is not evidence of a real project.
 
 Scroll reveals use IntersectionObserver; all content remains visible if it is unavailable. Buttons have restrained hover/press effects and map navigation retains its own interaction behaviour. Smooth scrolling and motion are disabled when the visitor requests reduced motion.
+
+## Integration validation (11 September 2026)
+
+- Production build and TypeScript checks passed on Windows / Node 22.18.
+- All 60,359 rows reconciled field by field against the 36 original CSVs; allocation, status, grouping, filtering and CSV export checks passed.
+- Existing domain tests and local Worker API smoke tests passed, including ownership, persistence, feedback, review and evidence uploads. The API test harness now serializes native Node FormData explicitly and uses its actual local server origin.
+- New dataset files pass targeted lint. Repository-wide lint still reports pre-existing issues in the original workspace route, legacy dashboard and project map.
+- Browser visual testing could not run because no browser connection was available in this session. Local HTTP serving and compiled outputs were checked.

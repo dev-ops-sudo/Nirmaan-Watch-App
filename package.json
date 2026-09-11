@@ -7,14 +7,16 @@
   },
   "scripts": {
     "install:ci": "bash scripts/install-ci.sh",
-    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
-    "build": "bash scripts/build-verified.sh",
-    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && npm run test:domain && npm run test:api",
-    "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
+    "dev": "node scripts/platform.mjs dev",
+    "build": "node scripts/platform.mjs build",
+    "start": "node scripts/platform.mjs start",
+    "test": "npm run build && npm run test:domain && npm run test:mplads && npm run test:api",
+    "lint": "node scripts/platform.mjs lint",
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
     "test:domain": "node scripts/test-domain.mjs",
-    "test:api": "node tests/api-smoke.mjs"
+    "test:api": "node tests/api-smoke.mjs",
+    "data:prepare": "python scripts/prepare-mplads.py",
+    "test:mplads": "node scripts/test-mplads.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

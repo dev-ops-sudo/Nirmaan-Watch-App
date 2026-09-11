@@ -24,7 +24,7 @@ export const compactMoney=(n:number)=>n>=1e7?`₹${(n/1e7).toFixed(2)} Cr`:n>=1e
 export const dayDiff=(a:string,b:string)=>Math.floor((Date.parse(a)-Date.parse(b))/86400000);
 export function plannedProgress(p:Project,asOf:string){const total=dayDiff(p.dueDate,p.startDate);return Math.max(0,Math.min(100,total<=0?100:dayDiff(asOf,p.startDate)/total*100));}
 export const csvColumns=['id','title','category','state','district','location','lat','lng','agency','contractor','contractorId','mp','estimated','sanctioned','released','spent','progress','startDate','dueDate','status','source','updatedAt','contractValue','revised','quantity','unit'];
-export function parseCsv(text:string):Record<string,unknown>[] {
+export function parseCsv(text:string,trimValues=true):Record<string,unknown>[] {
   const rows:string[][]=[];let row:string[]=[];let field='';let quoted=false;
   text=text.replace(/^\uFEFF/,'');
   for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){field+='"';i++;}else if(!quoted&&field.length)throw new Error('Unexpected quote in CSV');else quoted=!quoted;}
@@ -32,7 +32,7 @@ export function parseCsv(text:string):Record<string,unknown>[] {
   if(quoted)throw new Error('Unclosed quotation in CSV');row.push(field);if(row.some(x=>x.trim()))rows.push(row);
   const headers=rows.shift()?.map(x=>x.trim());if(!headers?.length)throw new Error('CSV is empty');if(new Set(headers).size!==headers.length)throw new Error('Duplicate column names');
   const numeric=['lat','lng','estimated','sanctioned','released','spent','progress','contractValue','revised','quantity'];
-  return rows.map((r,i)=>{if(r.length!==headers.length)throw new Error(`Row ${i+2}: expected ${headers.length} columns`);return Object.fromEntries(headers.map((h,j)=>[h,numeric.includes(h)?(r[j].trim()===''?null:Number(r[j])):r[j].trim()]));});
+  return rows.map((r,i)=>{if(r.length!==headers.length)throw new Error(`Row ${i+2}: expected ${headers.length} columns`);return Object.fromEntries(headers.map((h,j)=>[h,numeric.includes(h)?(r[j].trim()===''?null:Number(r[j])):trimValues?r[j].trim():r[j]]));});
 }
 export function validateImport(rows:unknown){if(!Array.isArray(rows)||rows.length===0||rows.length>500)throw new Error('Import between 1 and 500 projects at a time');const seen=new Set<string>();return rows.map((r,i)=>{const result=projectSchema.safeParse(r);if(!result.success)throw new Error(`Row ${i+1}: ${result.error.issues.map(e=>`${e.path.join('.')}: ${e.message}`).join('; ')}`);if(seen.has(result.data.id))throw new Error(`Duplicate project ID: ${result.data.id}`);seen.add(result.data.id);return result.data;});}
 export function exportCsv(projects:Project[]){return [csvColumns.join(','),...projects.map(p=>csvColumns.map(k=>{let v=String(p[k as keyof Project]??'');if(typeof p[k as keyof Project]==='string'&&/^[=+@\t\r-]/.test(v))v="'"+v;return '"'+v.replaceAll('"','""')+'"';}).join(','))].join('\r\n');}

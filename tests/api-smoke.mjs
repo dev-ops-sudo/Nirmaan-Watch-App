@@ -7,9 +7,10 @@ try {
  const db=await mf.getD1Database('DB');
  const migration=await readFile('drizzle/0000_ancient_sabra.sql','utf8');
  for(const statement of migration.split('--> statement-breakpoint'))await db.prepare(statement.trim()).run();
- const call=(path,options={})=>mf.dispatchFetch(`http://example.test${path}`,options);
+ const origin=(await mf.ready).origin;
+ const call=(path,options={})=>mf.dispatchFetch(`${origin}${path}`,options);
  let r=await call('/api/workspace');assert.equal(r.status,401,'Anonymous records access must be rejected');
- const headers={'oai-authenticated-user-email':'owner@example.test','Content-Type':'application/json','Origin':'http://example.test'};
+ const headers={'oai-authenticated-user-email':'owner@example.test','Content-Type':'application/json','Origin':origin};
  r=await call('/api/workspace',{headers});assert.equal(r.status,200);const data=await r.json();assert.equal(data.user.isAdmin,true);assert.equal(data.projects.length,0);
  const p={id:'TEST-001',title:'Test water network',category:'Water',state:'Delhi',district:'Test district',location:'Test locality',lat:28.6,lng:77.2,agency:'Test agency',contractor:'Test contractor',contractorId:'TC1',mp:'Test MP',estimated:1000000,sanctioned:1000000,released:500000,spent:400000,progress:40,startDate:'2026-01-01',dueDate:'2026-12-31',status:'Ongoing',source:'Automated local test',updatedAt:'2026-09-05'};
  r=await call('/api/workspace',{method:'POST',headers,body:JSON.stringify({action:'import',projects:[p]})});assert.equal(r.status,200,await r.text());
@@ -26,7 +27,8 @@ try {
  const flagged=await (await call('/api/workspace',{headers})).json();assert.ok(flagged.alerts.length>0);const alert=flagged.alerts[0];
  r=await call('/api/workspace',{method:'POST',headers,body:JSON.stringify({action:'review',id:alert.id,projectId:p.id,status:'Investigating',note:'Requested the revised sanction order for reconciliation.'})});assert.equal(r.status,200,await r.text());
  const form=new FormData();form.append('projectId',p.id);form.append('file',new Blob(['%PDF-1.4\nLocal synthetic evidence'],{type:'application/pdf'}),'test-evidence.pdf');
- r=await call('/api/documents',{method:'POST',headers:{'oai-authenticated-user-email':'owner@example.test','Origin':'http://example.test'},body:form});assert.equal(r.status,200,await r.text());
+ const upload=new Request('http://example.test/api/documents',{method:'POST',body:form});
+ r=await call('/api/documents',{method:'POST',headers:{'oai-authenticated-user-email':'owner@example.test','Origin':origin,'Content-Type':upload.headers.get('content-type')},body:await upload.arrayBuffer()});assert.equal(r.status,200,await r.text());
  const withDoc=await (await call('/api/workspace',{headers})).json();assert.equal(withDoc.documents.length,1);assert.equal(withDoc.reviews[0].status,'Investigating');
  r=await call('/api/documents?id='+withDoc.documents[0].id,{headers});assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'application/pdf');assert.match(await r.text(),/Local synthetic evidence/);
  r=await call('/api/documents?id='+withDoc.documents[0].id);assert.equal(r.status,401);
