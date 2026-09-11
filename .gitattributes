@@ -1,0 +1,2 @@
+# Keep original CSV bytes stable for the published source checksums.
+data/source/*.csv -text
