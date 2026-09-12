@@ -1,25 +1,107 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Bot, Send, Sparkles, ChevronDown, ChevronUp, RefreshCw, ExternalLink, ArrowRight, CornerDownLeft } from 'lucide-react';
+import { Bot, Send, Sparkles, ChevronDown, ChevronUp, RefreshCw, ExternalLink, Landmark } from 'lucide-react';
 
 interface StateRagChatProps {
   currentState: string;
   onSelectWork?: (workId: string) => void;
 }
 
+function FormattedAiMessage({ text }: { text: string }) {
+  if (!text) return null;
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const elements: React.ReactNode[] = [];
+  let currentKvItems: { label: string; value: string }[] = [];
+
+  const flushKv = (keyPrefix: number) => {
+    if (currentKvItems.length > 0) {
+      const items = [...currentKvItems];
+      elements.push(
+        <div key={`kv-card-${keyPrefix}`} className="rag-kv-card">
+          {items.map((item, i) => (
+            <div key={i} className="rag-kv-row">
+              <span className="rag-kv-label">{item.label}:</span>
+              <span className={`rag-kv-value ${/₹|Crore|Cr/i.test(item.value) ? 'font-mono font-bold text-orange-600 dark:text-orange-400' : ''}`}>
+                {item.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+      currentKvItems = [];
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    // 1. Key-Value line: e.g.
+    // * **Hon'ble MP:** EATALA RAJENDER
+    // - **Constituency:** MALKAJGIRI, Telangana
+    // - Hon'ble MP: EATALA RAJENDER
+    // **Official Allocated Limit:** ₹32,74,77,390.86
+    const kvMatch = line.match(/^[\*\-•]?\s*(?:\*\*)?([^*:]+?)(?:\*\*)?:\s*(.*)$/);
+    if (kvMatch && kvMatch[2].trim()) {
+      currentKvItems.push({
+        label: kvMatch[1].replace(/[\*\-•]/g, '').trim(),
+        value: kvMatch[2].replace(/\*\*/g, '').trim()
+      });
+      return;
+    }
+
+    flushKv(idx);
+
+    // 2. Heading line: e.g.
+    // **Cross-Reference with Project Works:**
+    // ### Summary
+    const headingMatch = line.match(/^(?:###\s*|\*\*)([^*#]+?)(?:\*\*|:)?$/);
+    if (headingMatch && !line.startsWith('* ') && !line.startsWith('- ')) {
+      const hText = headingMatch[1].replace(/[:*#]/g, '').trim();
+      elements.push(
+        <h4 key={`h-${idx}`} className="rag-section-heading">
+          {hText}
+        </h4>
+      );
+      return;
+    }
+
+    // 3. Bullet line:
+    if (line.startsWith('* ') || line.startsWith('- ') || line.startsWith('• ')) {
+      const cleanBullet = line.replace(/^[\*\-•]\s+/, '').replace(/\*\*/g, '').trim();
+      elements.push(
+        <div key={`bullet-${idx}`} className="rag-bullet-item">
+          <span className="rag-bullet-dot" />
+          <span>{cleanBullet}</span>
+        </div>
+      );
+      return;
+    }
+
+    // 4. Regular paragraph
+    elements.push(
+      <p key={`p-${idx}`} className="rag-paragraph">
+        {line.replace(/\*\*/g, '').trim()}
+      </p>
+    );
+  });
+
+  flushKv(lines.length);
+
+  return <div className="rag-formatted-content">{elements}</div>;
+}
+
 export default function StateRagChat({ currentState, onSelectWork }: StateRagChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string; citations?: any[]; summary?: any }[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string; citations?: any[]; summary?: any; mpAllocations?: any[] }[]>([]);
 
   const stateTitle = currentState !== 'All states' ? currentState : 'All India';
 
   const quickQuestions = [
-    `Who are the MPs representing ${stateTitle}?`,
+    `Which MP has the highest allocated limit in ${stateTitle}?`,
     `Total MPLADS fund allocation in ${stateTitle}`,
-    `Which MP has the highest allocation in ${stateTitle}?`,
+    `Allocated budget limit for MPs in ${stateTitle}`,
     `Drinking water and road connectivity works in ${stateTitle}`,
     `Projects pending IDA administrative approval`
   ];
@@ -51,7 +133,8 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
           role: 'ai',
           text: data.answer,
           citations: data.citations,
-          summary: data.summary
+          summary: data.summary,
+          mpAllocations: data.mpAllocations
         }
       ]);
     } catch (err) {
@@ -68,52 +151,49 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs overflow-hidden mb-6 transition-all duration-200">
+    <div className="rag-container">
       {/* Header Bar */}
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-3 bg-zinc-50/70 hover:bg-zinc-100/70 dark:bg-zinc-800/40 dark:hover:bg-zinc-800/70 flex items-center justify-between cursor-pointer transition select-none"
+        className="rag-header"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center shrink-0 shadow-2xs">
-            <Sparkles size={15} />
+        <div className="rag-header-left">
+          <div className="rag-icon-wrapper">
+            <Sparkles size={18} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 tracking-tight">
+            <div className="rag-title-row">
+              <h3>
                 {stateTitle} Development Intelligence
               </h3>
-              <span className="text-[10px] bg-zinc-200/70 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium px-2 py-0.5 rounded">
-                Grounded RAG
-              </span>
             </div>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+            <p className="rag-subtitle">
               Query MP allocations, village initiatives, and sanction records
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100">
+        <div className="rag-toggle">
           <span>{isOpen ? 'Collapse' : 'Ask Question'}</span>
-          {isOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
       </div>
 
       {/* Expandable Chat Area */}
       {isOpen && (
-        <div className="p-4 sm:p-5 space-y-4 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="rag-body">
           {/* Quick Query Pills */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
+          <div>
+            <span className="rag-suggestions-title">
               Suggested Inquiries
             </span>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="rag-suggestions-list">
               {quickQuestions.map((qq, i) => (
                 <button
                   key={i}
                   onClick={() => handleSend(qq)}
                   disabled={loading}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition text-left"
+                  className="rag-suggestion-btn"
                 >
                   {qq}
                 </button>
@@ -122,10 +202,10 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
           </div>
 
           {/* Messages History */}
-          <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+          <div className="rag-messages-area">
             {messages.length === 0 && !loading && (
-              <div className="py-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
-                <Bot size={22} className="mx-auto mb-2 opacity-50" />
+              <div className="rag-empty-state">
+                <Bot size={32} opacity={0.3} />
                 <p>Type any inquiry to inspect {stateTitle}&rsquo;s records, budgets, or MP recommendations.</p>
               </div>
             )}
@@ -133,30 +213,68 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
             {messages.map((m, idx) => (
               <div 
                 key={idx} 
-                className={`p-3.5 rounded-xl text-xs leading-relaxed ${
-                  m.role === 'user' 
-                    ? 'bg-zinc-900 text-white ml-8 font-medium' 
-                    : 'bg-zinc-50 dark:bg-zinc-800/70 text-zinc-800 dark:text-zinc-200 mr-8 border border-zinc-200 dark:border-zinc-700/60 whitespace-pre-wrap'
-                }`}
+                className={`rag-message ${m.role}`}
               >
-                {m.text}
+                {m.role === 'ai' ? (
+                  <FormattedAiMessage text={m.text} />
+                ) : (
+                  <div>{m.text}</div>
+                )}
 
-                {/* Citation Records */}
+                {/* Citation Records - Only shown when matching records exist */}
                 {m.citations && m.citations.length > 0 && (
-                  <div className="mt-3 pt-2.5 border-t border-zinc-200 dark:border-zinc-700/60 space-y-1.5">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
-                      Referenced Records ({m.citations.length})
+                  <div className="rag-citations-area">
+                    <span className="rag-citations-title">
+                      Referenced Works ({m.citations.length})
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {m.citations.slice(0, 6).map(c => (
+                    <div className="rag-citation-list">
+                      {m.citations.slice(0, 4).map(c => (
                         <button
                           key={c.id}
                           onClick={() => onSelectWork && onSelectWork(c.id)}
-                          className="px-2 py-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded text-[10px] font-mono hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-700 dark:text-zinc-300 transition inline-flex items-center gap-1"
+                          className="rag-citation-btn"
+                          title={`${c.title} (${c.status})`}
                         >
                           <span>{c.id}</span>
-                          <ExternalLink size={9} />
+                          <ExternalLink size={10} />
                         </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* MP Official Allocated Limit Mini-Badge */}
+                {m.mpAllocations && m.mpAllocations.length > 0 && (
+                  <div className="rag-mp-allocations-area" style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                    <span className="rag-citations-title" style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                      <Landmark size={11} />
+                      MP Official Entitlement Quota
+                    </span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {m.mpAllocations.slice(0, 2).map((mpItem, mpIdx) => (
+                        <div
+                          key={mpIdx}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '5px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(234, 88, 12, 0.25)',
+                            background: 'rgba(255, 237, 213, 0.45)',
+                            fontSize: '11px'
+                          }}
+                        >
+                          <strong style={{ color: '#0f172a' }}>
+                            {mpItem.mp_name}
+                          </strong>
+                          <span style={{ fontSize: '10px', color: '#64748b' }}>
+                            ({mpItem.constituency})
+                          </span>
+                          <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#ea580c' }}>
+                            ₹{mpItem.allocated_crores} Cr
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -165,15 +283,15 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
             ))}
 
             {loading && (
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-xs text-zinc-600 dark:text-zinc-400 flex items-center gap-2 mr-8 border border-zinc-200 dark:border-zinc-700">
-                <RefreshCw size={13} className="animate-spin text-zinc-600 dark:text-zinc-400" />
+              <div className="rag-loading">
+                <RefreshCw size={14} className="rag-loading-spin" />
                 <span>Synthesizing records for {stateTitle}...</span>
               </div>
             )}
           </div>
 
           {/* Input Bar */}
-          <div className="flex items-center gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+          <div className="rag-input-bar">
             <input
               type="text"
               placeholder={`Ask about ${stateTitle}'s MPs, village projects, or fund allocations...`}
@@ -183,15 +301,15 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
                 if (e.key === 'Enter') handleSend();
               }}
               disabled={loading}
-              className="flex-1 px-3.5 py-2 text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="rag-input"
             />
             <button
               onClick={() => handleSend()}
               disabled={loading || !query.trim()}
-              className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+              className="rag-submit-btn"
             >
               <span>Submit</span>
-              <Send size={12} />
+              <Send size={14} />
             </button>
           </div>
         </div>

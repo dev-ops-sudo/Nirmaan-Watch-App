@@ -272,63 +272,45 @@ export default function WorkModal({ work, onClose, onViewMpDossier }: WorkModalP
             )}
           </div>
 
-          {/* Complete 16-Field Tabulated Metadata Grid */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-              Official MPLADS Registry Record (All 16 Fields)
+          {/* Clean Administrative & Location Details */}
+          <div className="bg-zinc-50/80 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60 p-4 space-y-4">
+            <h3 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider flex items-center justify-between">
+              <span>Project & Administrative Specifications</span>
+              <span className="text-[11px] font-normal text-zinc-400">Official MoSPI Registry</span>
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">WORK ID</span>
-                <strong className="text-zinc-900 dark:text-zinc-100 font-mono">{work.id}</strong>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-xs">
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Recommending MP</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">{work.mp} ({work.house})</span>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">RECOMMENDING MP</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.mp}</strong>
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Constituency & State</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">{work.constituency}, {work.state}</span>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">PARLIAMENTARY HOUSE</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.house}</strong>
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Implementing Authority</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">{work.agency || 'District Implementing Agency'}</span>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">STATE / UT</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.state}</strong>
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Recommended Date</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">{work.recommended || 'Not recorded'}</span>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">CONSTITUENCY</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.constituency}</strong>
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Work Category</span>
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">{work.category}</span>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">CITY / TOWN</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.city || 'Not reported'}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">WARD</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.ward || 'Not reported'}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">BLOCK / TALUKA</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.block || 'Not reported'}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">VILLAGE / LOCALITY</span>
-                <strong className="text-orange-600 dark:text-orange-400 font-semibold">{work.village || 'Not reported'}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">WORK CATEGORY</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.category}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">IMPLEMENTING AUTHORITY</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.agency || 'Not reported'}</strong>
-              </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700/50">
-                <span className="text-zinc-400 block font-medium">RECOMMENDED DATE</span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{work.recommended}</strong>
+              <div className="flex justify-between py-1.5 border-b border-zinc-200/50 dark:border-zinc-700/50">
+                <span className="text-zinc-500 font-medium">Location Scope</span>
+                <span className="font-semibold text-orange-600 dark:text-orange-400">
+                  {[work.village, work.city, work.block].filter(Boolean).join(' · ') || 'Constituency Wide'}
+                </span>
               </div>
             </div>
-            <div className="p-3 bg-zinc-100/70 dark:bg-zinc-800/30 rounded-lg text-xs text-zinc-500 flex items-center justify-between">
-              <span>Source File Trace: <strong>{work.file}</strong> (CSV Row {work.line})</span>
+
+            {/* Export & Trace Row */}
+            <div className="pt-2 flex items-center justify-between text-xs text-zinc-500">
+              <span>Registry Source: <strong>{work.file}</strong> (Line {work.line})</span>
               <button 
                 onClick={() => {
                   const blob = new Blob([sourceCsv([work])], { type: 'text/csv;charset=utf-8' });
@@ -339,10 +321,10 @@ export default function WorkModal({ work, onClose, onViewMpDossier }: WorkModalP
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
-                className="text-orange-600 hover:text-orange-700 font-bold inline-flex items-center gap-1"
+                className="text-orange-600 hover:text-orange-700 font-bold inline-flex items-center gap-1.5 transition"
               >
                 <ArrowDownToLine size={13} />
-                Export CSV
+                <span>Download Official CSV</span>
               </button>
             </div>
           </div>
