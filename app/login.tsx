@@ -243,16 +243,37 @@ export default function Login({ onLogin, onClose }: LoginProps) {
         </button>
 
         {/* Footer Toggle */}
-        <div className="mt-10 text-center">
-          <p className="text-[14px] text-zinc-500 dark:text-zinc-400">
-            {mode === 'signin' ? 'New to our platform? ' : 'Already have an account? '}
-            <button 
-              onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setErrorMsg(''); setSuccessMsg(''); }}
-              className="text-orange-600 dark:text-orange-500 font-medium hover:underline transition-all outline-none"
-            >
-              {mode === 'signin' ? 'Create Account' : 'Sign In'}
-            </button>
-          </p>
+        <div className="mt-10 text-center text-[14px] text-zinc-500 dark:text-zinc-400">
+          {mode === 'signin' ? 'New to our platform? ' : 'Already have an account? '}
+          <button 
+            type="button"
+            onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setErrorMsg(''); setSuccessMsg(''); }}
+            className="text-orange-600 dark:text-orange-500 font-medium hover:underline transition-all outline-none inline"
+          >
+            {mode === 'signin' ? 'Create Account' : 'Sign In'}
+          </button>
+        </div>
+
+        {/* Instant Demo Bypass */}
+        <div className="mt-8 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              onLogin('citizen', {
+                id: 'citizen-demo-user',
+                email: 'citizen@nirmaan.org',
+                user_metadata: {
+                  full_name: 'Ramesh Kumar',
+                  role: 'citizen'
+                }
+              });
+            }}
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            title="Use this for a quick 1-click test without signing up"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span>Explore as Guest</span>
+          </button>
         </div>
 
       </div>
