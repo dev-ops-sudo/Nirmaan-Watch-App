@@ -10,11 +10,8 @@ import { columns, decodeRows, emptyFilters, filterWorks, groupWorks, sourceCsv, 
 import { SideNav } from './dashboard';
 import CivicBanner from './civic-banner';
 import ProjectReviews from './project-reviews';
-<<<<<<< HEAD
 import ProfileModal from './profile-modal';
-=======
 import CesiumGlobe from '@/components/geo/CesiumGlobe';
->>>>>>> 745ce73 (Integrate Cesium geo intelligence and satellite view)
 function subscribeView(callback:()=>void){window.addEventListener('popstate',callback);return()=>window.removeEventListener('popstate',callback);}
 function currentView(){const v=new URLSearchParams(window.location.search).get('view');return v&&titles[v]?v:'overview';}
 const count=(n:number)=>n.toLocaleString('en-IN');
