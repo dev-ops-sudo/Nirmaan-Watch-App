@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { User, Building2, Lock, Mail, ArrowRight, X, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Lock, Mail, ArrowRight, X, Loader2, CheckCircle2, LayoutDashboard } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { NirmaanLogo } from './nirmaan-logo';
 
@@ -54,7 +54,6 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
     try {
       if (mode === 'signup') {
-        // Citizen Sign Up with Supabase
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
@@ -68,7 +67,6 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
         if (error) throw error;
 
-        // In Supabase, if user already exists, identities is an empty array
         if (data.user && data.user.identities && data.user.identities.length === 0) {
           setErrorMsg('An account with this email already exists. Please switch to Sign In.');
           return;
@@ -80,10 +78,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             onLogin('citizen', data.user);
           }, 800);
         } else {
-          setSuccessMsg('Confirmation email sent! Please check your email inbox to verify and activate your account.');
+          setSuccessMsg('Confirmation email sent! Please check your inbox to verify.');
         }
       } else {
-        // Citizen Sign In with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password
@@ -92,9 +89,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
         if (error) {
           const msg = (error.message || '').toLowerCase();
           if (msg.includes('invalid login credentials') || msg.includes('user not found') || (error as any).status === 400) {
-            setErrorMsg('User does not exist or credentials are invalid. Please check your email or click below to create an account.');
+            setErrorMsg('Invalid credentials. Please try again or create an account.');
           } else if (msg.includes('email not confirmed')) {
-            setErrorMsg('Email not confirmed. Please check your inbox for the confirmation email sent earlier.');
+            setErrorMsg('Email not confirmed. Please check your inbox.');
           } else {
             setErrorMsg(error.message || 'Authentication failed. Please verify credentials.');
           }
@@ -108,138 +105,102 @@ export default function Login({ onLogin, onClose }: LoginProps) {
       }
     } catch (err: any) {
       console.error('Supabase Auth error:', err);
-      const msg = (err?.message || '').toLowerCase();
-      if (msg.includes('invalid login credentials') || msg.includes('user not found')) {
-        setErrorMsg('User does not exist. Please check your email or click below to create an account.');
-      } else if (msg.includes('email not confirmed')) {
-        setErrorMsg('Email not confirmed. Please check your inbox for the confirmation email.');
-      } else {
-        setErrorMsg(err.message || 'Authentication failed. Please verify credentials.');
-      }
+      setErrorMsg(err.message || 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. Quick Citizen Demo for Hackathon Evaluation
+  // 3. Quick Citizen Demo
   const handleQuickDemo = () => {
     onLogin('citizen', {
       id: 'citizen-demo-user',
       email: 'citizen@nirmaan.org',
       user_metadata: {
-        full_name: 'Ramesh Kumar (Citizen)',
+        full_name: 'Ramesh Kumar',
         role: 'citizen'
       }
     });
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col justify-center py-8 sm:px-6 lg:px-8 animate-in fade-in duration-200">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+    <div className="fixed inset-0 bg-zinc-950/70 backdrop-blur-md z-50 flex flex-col justify-center items-center p-4 sm:p-6 animate-in fade-in duration-300">
+      <div className="relative w-full max-w-[420px] bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-800/60 overflow-hidden transition-all">
+        
+        {/* Subtle Gradient Glow Background */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-orange-500/10 to-transparent pointer-events-none"></div>
+
+        {/* Close Button */}
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full p-1.5 transition-colors"
+          className="absolute top-4 right-4 z-10 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 bg-white/50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-full p-2 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-orange-500/50"
           aria-label="Close"
         >
-          <X size={18} />
+          <X size={18} strokeWidth={2.5} />
         </button>
 
-        <div className="pt-8 pb-8 px-6 sm:px-10">
+        <div className="relative pt-10 pb-8 px-6 sm:px-10 z-10">
           {/* Header */}
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <NirmaanLogo size={46} />
-          </div>
-          <h2 className="text-center text-2xl font-black text-gray-900 tracking-tight">
-            Citizen Login
-          </h2>
-          <p className="mt-1 text-center text-xs text-gray-500 mb-5">
-            Access public funds monitoring, ongoing works & citizen reviews
-          </p>
-
-          {/* Google OAuth Button */}
-          <button 
-            type="button"
-            onClick={handleGoogleOAuth} 
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl font-medium hover:bg-gray-50 transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-              <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
-                <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
-                <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
-                <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
-                <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
-              </g>
-            </svg>
-            <span className="text-sm font-semibold">Sign in with Google</span>
-          </button>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
-            <div className="relative flex justify-center text-xs"><span className="px-3 bg-white text-gray-400 uppercase font-medium">Or Supabase Auth</span></div>
+          <div className="flex flex-col items-center mb-8">
+            <div className="bg-white dark:bg-zinc-950 p-3 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 mb-5">
+              <NirmaanLogo size={42} />
+            </div>
+            <h2 className="text-center text-2xl font-bold text-zinc-900 dark:text-white tracking-tight mb-1.5">
+              Citizen Access
+            </h2>
+            <p className="text-center text-[13px] text-zinc-500 dark:text-zinc-400 font-medium max-w-[260px]">
+              Monitor public funds, ongoing works, and community reviews.
+            </p>
           </div>
 
-          {/* Sign In vs Sign Up Tabs */}
-          <div className="flex bg-gray-100 p-1 rounded-xl mb-4 text-xs font-semibold">
+          {/* Segmented Control for Sign In / Sign Up */}
+          <div className="flex bg-zinc-100/80 dark:bg-zinc-950/50 p-1.5 rounded-xl mb-6 shadow-inner relative">
             <button
               type="button"
               onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-1.5 rounded-lg transition-all ${mode === 'signin' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all duration-200 z-10 ${mode === 'signin' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessMsg(''); }}
-              className={`flex-1 py-1.5 rounded-lg transition-all ${mode === 'signup' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              className={`flex-1 py-2 text-[13px] font-semibold rounded-lg transition-all duration-200 z-10 ${mode === 'signup' ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
             >
               Create Account
             </button>
+            <div 
+              className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white dark:bg-zinc-800 rounded-lg shadow-sm transition-transform duration-300 ease-out"
+              style={{ transform: mode === 'signin' ? 'translateX(0)' : 'translateX(100%)' }}
+            ></div>
           </div>
 
           {/* Alerts */}
           {errorMsg && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex flex-col gap-1.5">
-              <div className="flex items-start gap-2">
-                <span className="font-bold shrink-0">Notice:</span>
-                <span>{errorMsg}</span>
+            <div className="mb-6 p-3.5 bg-red-50/50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 text-[13px] rounded-xl flex items-start gap-2.5 animate-in slide-in-from-top-2">
+              <div className="mt-0.5">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path></svg>
               </div>
-              {mode === 'signin' && (errorMsg.includes('does not exist') || errorMsg.includes('credentials')) && (
-                <button
-                  type="button"
-                  onClick={() => { setMode('signup'); setErrorMsg(''); }}
-                  className="text-left font-bold text-orange-700 underline text-xs mt-0.5 hover:text-orange-900 flex items-center gap-1"
-                >
-                  <span>User not found? Click here to Sign Up</span>
-                  <ArrowRight size={12} />
-                </button>
-              )}
+              <div className="font-medium leading-relaxed">{errorMsg}</div>
             </div>
           )}
           {successMsg && (
-            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs rounded-xl flex items-start gap-2 shadow-xs">
-              <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <span className="font-semibold block">{successMsg}</span>
-                {successMsg.includes('Confirmation email sent') && (
-                  <span className="text-[11px] text-emerald-700 mt-1 block">
-                    Once verified in your email, switch to <strong>Sign In</strong> to access your dashboard.
-                  </span>
-                )}
-              </div>
+            <div className="mb-6 p-3.5 bg-emerald-50/50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[13px] rounded-xl flex items-start gap-2.5 shadow-sm animate-in slide-in-from-top-2">
+              <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+              <div className="font-medium leading-relaxed">{successMsg}</div>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
                   Full Name
                 </label>
-                <div className="relative rounded-lg shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <User size={15} />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                    <User size={16} />
                   </div>
                   <input
                     type="text"
@@ -247,17 +208,19 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                   />
                 </div>
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Email Address</label>
-              <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Mail size={15} />
+            <div className="space-y-1.5">
+              <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
+                Email Address
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                  <Mail size={16} />
                 </div>
                 <input
                   type="email"
@@ -265,16 +228,18 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="citizen@example.com"
-                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
-              <div className="relative rounded-lg shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Lock size={15} />
+            <div className="space-y-1.5">
+              <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
+                Password
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                  <Lock size={16} />
                 </div>
                 <input
                   type="password"
@@ -282,43 +247,69 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl shadow-md text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 transition-all active:scale-[0.99] disabled:opacity-60"
-            >
-              {loading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Connecting to Supabase...</span>
-                </>
-              ) : (
-                <>
-                  <span>{mode === 'signup' ? 'Create Citizen Account' : 'Sign In as Citizen'}</span>
-                  <ArrowRight size={15} />
-                </>
-              )}
-            </button>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full relative overflow-hidden group flex items-center justify-center gap-2 py-3 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] text-[14px] font-bold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{mode === 'signup' ? 'Create Account' : 'Sign In securely'}</span>
+                    <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                  </>
+                )}
+              </button>
+            </div>
           </form>
 
-          {/* Instant Demo Bypass for Hackathon Demo */}
-          <div className="mt-5 pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase text-gray-400 tracking-wider">Instant Demo Mode</span>
-              <span className="text-[10px] text-gray-400">1-click citizen access</span>
+          <div className="relative my-7">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-zinc-200 dark:border-zinc-800"></div>
             </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-3 bg-white dark:bg-zinc-900 text-zinc-400 font-medium">Or continue with</span>
+            </div>
+          </div>
+
+          {/* Google OAuth Button */}
+          <button 
+            type="button"
+            onClick={handleGoogleOAuth} 
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 px-4 py-3 rounded-xl text-[14px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 group"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" className="group-hover:scale-105 transition-transform">
+              <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
+                <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
+                <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
+                <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
+                <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
+              </g>
+            </svg>
+            Google
+          </button>
+
+          {/* Instant Demo Bypass */}
+          <div className="mt-8 text-center">
             <button
               type="button"
               onClick={handleQuickDemo}
-              className="w-full py-2 px-3 bg-gray-50 hover:bg-orange-50 text-orange-700 border border-gray-200 hover:border-orange-200 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2"
+              className="inline-flex items-center gap-1.5 text-[12px] font-medium text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+              title="Use this for a quick 1-click test without signing up"
             >
-              <User size={15} />
-              <span>Quick Citizen Demo Access</span>
+              <LayoutDashboard size={14} />
+              <span>Explore as Guest</span>
             </button>
           </div>
 
