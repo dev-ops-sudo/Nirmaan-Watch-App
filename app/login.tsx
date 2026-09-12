@@ -42,12 +42,26 @@ export default function Login({ onLogin, onClose }: LoginProps) {
     }
   };
 
+  const generateGovId = () => {
+    const random10 = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    setOfficialId(random10);
+  };
+
   // 2. Supabase Email/Password (Sign In or Sign Up)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
     setSuccessMsg('');
+
+    // Validate 10-digit Government ID for Officials
+    if (roleType === 'official') {
+      if (!officialId || !/^\d{10}$/.test(officialId.trim())) {
+        setErrorMsg('Government ID must be exactly 10 digits (e.g. 9845120345).');
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       if (mode === 'signup') {
@@ -57,9 +71,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           password,
           options: {
             data: {
-              full_name: roleType === 'official' ? (officialId || name) : name,
+              full_name: roleType === 'official' ? (name || `Official ${officialId}`) : name,
               role: roleType,
-              official_id: roleType === 'official' ? officialId : undefined,
+              official_id: roleType === 'official' ? officialId.trim() : undefined,
             }
           }
         });
@@ -100,6 +114,17 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           return;
         }
 
+        // Verify Government ID if logging in as Official
+        if (roleType === 'official') {
+          const registeredId = data.user?.user_metadata?.official_id;
+          if (registeredId && registeredId !== officialId.trim()) {
+            await supabase.auth.signOut();
+            setErrorMsg(`Government ID verification failed. The provided 10-digit ID does not match this official account.`);
+            setLoading(false);
+            return;
+          }
+        }
+
         const userRole = (data.user?.user_metadata?.role as 'citizen' | 'official') || 
                          (email.toLowerCase().includes('gov') ? 'official' : roleType);
 
@@ -130,6 +155,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
       email: role === 'official' ? 'official@mplads.gov.in' : 'citizen@demo.org',
       user_metadata: {
         full_name: role === 'official' ? 'Inspector R. K. Sharma' : 'Ramesh Kumar (Citizen)',
+        official_id: role === 'official' ? '1092837465' : undefined,
         role
       }
     });
@@ -285,20 +311,44 @@ export default function Login({ onLogin, onClose }: LoginProps) {
               </div>
             )}
 
-            {mode === 'signup' && roleType === 'official' && (
+            {roleType === 'official' && (
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Government ID / Badge Number</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-gray-700">
+                    10-Digit Government ID <span className="text-amber-600 font-bold">*</span>
+                  </label>
+                  {mode === 'signup' && (
+                    <button
+                      type="button"
+                      onClick={generateGovId}
+                      className="text-[11px] text-amber-700 hover:text-amber-900 font-semibold underline"
+                    >
+                      Auto-Generate ID
+                    </button>
+                  )}
+                </div>
                 <div className="relative rounded-lg shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <ShieldCheck size={15} />
                   </div>
                   <input
                     type="text"
+                    required
+                    maxLength={10}
                     value={officialId}
-                    onChange={(e) => setOfficialId(e.target.value)}
-                    placeholder="GOV-IDA-2026-X"
-                    className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setOfficialId(digits);
+                    }}
+                    placeholder={mode === 'signup' ? 'Create 10-digit ID (e.g. 9845120345)' : 'Enter your 10-digit Gov ID'}
+                    className="pl-9 block w-full text-xs font-mono tracking-wider border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
+                </div>
+                <div className="flex justify-between items-center mt-1 text-[10px] text-gray-500">
+                  <span>{mode === 'signup' ? 'Created during registration for official verification' : 'Registered 10-digit Government ID'}</span>
+                  <span className={officialId.length === 10 ? 'text-emerald-600 font-bold' : 'text-gray-400 font-mono'}>
+                    {officialId.length}/10 digits
+                  </span>
                 </div>
               </div>
             )}
