@@ -33,7 +33,7 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 max-w-md w-full overflow-hidden">
         {/* Header */}
-        <div className={`p-6 text-white ${isOfficial ? 'bg-gradient-to-r from-amber-700 to-amber-900' : 'bg-gradient-to-r from-blue-700 to-blue-900'} relative`}>
+        <div className={`p-6 text-white ${isOfficial ? 'bg-gradient-to-r from-amber-700 to-amber-900' : 'bg-gradient-to-r from-orange-600 to-orange-800'} relative`}>
           <button 
             onClick={onClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/20 hover:bg-black/30 p-1.5 rounded-full transition-colors"

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { User, Building2, Lock, Mail, ArrowRight, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { NirmaanLogo } from './nirmaan-logo';
 
 interface LoginProps {
   onLogin: (role: 'citizen', user?: any) => void;
@@ -145,10 +146,8 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
         <div className="pt-8 pb-8 px-6 sm:px-10">
           {/* Header */}
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
-              <Building2 size={32} />
-            </div>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <NirmaanLogo size={46} />
           </div>
           <h2 className="text-center text-2xl font-black text-gray-900 tracking-tight">
             Citizen Login
