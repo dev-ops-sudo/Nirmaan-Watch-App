@@ -68,8 +68,8 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
       </h3>
       
       {role === 'citizen' && (
-        <form onSubmit={handleSubmit} className="mb-8 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-          <h4 className="font-medium text-blue-900 mb-3">Leave a Review</h4>
+        <form onSubmit={handleSubmit} className="mb-8 bg-orange-50/50 p-4 rounded-lg border border-orange-200">
+          <h4 className="font-medium text-orange-950 mb-3">Leave a Review</h4>
           
           <div className="mb-3">
             <label className="block text-sm text-gray-700 mb-1">Rating</label>
@@ -79,7 +79,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
                   key={star}
                   type="button"
                   onClick={() => setRating(star)}
-                  className={`p-1 ${rating >= star ? 'text-amber-400' : 'text-gray-300'}`}
+                  className={`p-1 ${rating >= star ? 'text-orange-500' : 'text-gray-300'}`}
                 >
                   <Star size={24} fill={rating >= star ? 'currentColor' : 'none'} />
                 </button>
@@ -94,7 +94,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
               required
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full border-gray-300 rounded-md py-2 px-3 border text-sm"
+              className="w-full border-gray-300 rounded-md py-2 px-3 border text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
               placeholder="e.g. Ramesh Kumar"
             />
           </div>
@@ -105,7 +105,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
               required
               value={message}
               onChange={e => setMessage(e.target.value)}
-              className="w-full border-gray-300 rounded-md py-2 px-3 border text-sm"
+              className="w-full border-gray-300 rounded-md py-2 px-3 border text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
               rows={3}
               placeholder="Describe your observations about this project..."
             />
@@ -116,7 +116,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
           <button 
             type="submit" 
             disabled={submitting}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-70"
+            className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-700 disabled:opacity-70"
           >
             {submitting ? 'Submitting...' : 'Submit Review'} <Send size={14} />
           </button>

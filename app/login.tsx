@@ -146,7 +146,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
         <div className="pt-8 pb-8 px-6 sm:px-10">
           {/* Header */}
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+            <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
               <Building2 size={32} />
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                 <button
                   type="button"
                   onClick={() => { setMode('signup'); setErrorMsg(''); }}
-                  className="text-left font-bold text-blue-700 underline text-xs mt-0.5 hover:text-blue-900 flex items-center gap-1"
+                  className="text-left font-bold text-orange-700 underline text-xs mt-0.5 hover:text-orange-900 flex items-center gap-1"
                 >
                   <span>User not found? Click here to Sign Up</span>
                   <ArrowRight size={12} />
@@ -248,7 +248,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="citizen@example.com"
-                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -291,7 +291,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl shadow-md text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.99] disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl shadow-md text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 transition-all active:scale-[0.99] disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -316,7 +316,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             <button
               type="button"
               onClick={handleQuickDemo}
-              className="w-full py-2 px-3 bg-gray-50 hover:bg-blue-50 text-blue-700 border border-gray-200 hover:border-blue-200 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2 px-3 bg-gray-50 hover:bg-orange-50 text-orange-700 border border-gray-200 hover:border-orange-200 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2"
             >
               <User size={15} />
               <span>Quick Citizen Demo Access</span>

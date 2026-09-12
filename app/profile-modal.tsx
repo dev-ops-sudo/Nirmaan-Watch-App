@@ -68,7 +68,7 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-3.5 space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-gray-500 font-medium">Assigned Role</span>
-              <span className={`font-semibold px-2 py-0.5 rounded-md ${isOfficial ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+              <span className={`font-semibold px-2 py-0.5 rounded-md ${isOfficial ? 'bg-amber-100 text-amber-800' : 'bg-orange-100 text-orange-800'}`}>
                 {isOfficial ? 'Implementing District Authority' : 'Public Citizen'}
               </span>
             </div>
