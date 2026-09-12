@@ -16,7 +16,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
     try {
       const res = await fetch(`/api/reviews?projectId=${projectId}`);
       if (res.ok) {
-        const data = await res.json();
+        const data = (await res.json()) as any;
         setReviews(data.reviews || []);
       }
     } catch (e) {
@@ -43,7 +43,7 @@ export default function ProjectReviews({ projectId, role }: { projectId: string,
         body: JSON.stringify({ projectId, name, rating, message }),
       });
       
-      const data = await res.json();
+      const data = (await res.json()) as any;
       if (res.ok) {
         // Reset form
         setName('');

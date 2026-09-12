@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as any;
     
     // Simulate network delay to make it look realistic for the judges
     await new Promise(resolve => setTimeout(resolve, 800));

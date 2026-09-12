@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { desc, eq } from 'drizzle-orm';
-import { getDb } from '@/db';
+import { ensureDb } from '@/db';
 import * as s from '@/db/schema';
 import { z } from 'zod';
 
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await ensureDb();
     const reviews = await db.select()
       .from(s.feedback)
       .where(eq(s.feedback.projectId, projectId))
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     });
     
     const data = schema.parse(body);
-    const db = getDb();
+    const db = await ensureDb();
     
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
