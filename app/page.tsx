@@ -5,7 +5,7 @@ import Login from './login';
 import { supabase } from '@/lib/supabase';
 
 export default function Page() {
-  const [role, setRole] = useState<'citizen' | 'official' | 'guest'>('guest');
+  const [role, setRole] = useState<'citizen' | 'guest'>('guest');
   const [user, setUser] = useState<any>(null);
   const [showLogin, setShowLogin] = useState(false);
 
@@ -14,14 +14,7 @@ export default function Page() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
-        const metaRole = session.user.user_metadata?.role;
-        if (metaRole === 'official' || metaRole === 'citizen') {
-          setRole(metaRole);
-        } else if (session.user.email?.toLowerCase().includes('gov')) {
-          setRole('official');
-        } else {
-          setRole('citizen');
-        }
+        setRole('citizen');
       }
     });
 
@@ -29,14 +22,7 @@ export default function Page() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
-        const metaRole = session.user.user_metadata?.role;
-        if (metaRole === 'official' || metaRole === 'citizen') {
-          setRole(metaRole);
-        } else if (session.user.email?.toLowerCase().includes('gov')) {
-          setRole('official');
-        } else {
-          setRole('citizen');
-        }
+        setRole('citizen');
         setShowLogin(false);
       } else {
         setUser(null);

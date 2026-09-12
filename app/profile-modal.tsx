@@ -108,9 +108,9 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
                   </li>
                 </>
               ) : (
-                <li className="flex items-center gap-2 text-gray-400">
-                  <ShieldCheck size={14} className="text-gray-400 shrink-0" />
-                  <span>Administrative actions restricted to verified government badges</span>
+                <li className="flex items-center gap-2 text-blue-600">
+                  <CheckCircle2 size={14} className="text-blue-500 shrink-0" />
+                  <span>Public civic participation, community ratings & progress tracking</span>
                 </li>
               )}
             </ul>

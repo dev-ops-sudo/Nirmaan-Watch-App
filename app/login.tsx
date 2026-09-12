@@ -1,20 +1,18 @@
 'use client';
 import { useState } from 'react';
-import { ShieldCheck, User, Building2, Lock, Mail, ArrowRight, X, Loader2, CheckCircle2 } from 'lucide-react';
+import { User, Building2, Lock, Mail, ArrowRight, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface LoginProps {
-  onLogin: (role: 'citizen' | 'official', user?: any) => void;
+  onLogin: (role: 'citizen', user?: any) => void;
   onClose: () => void;
 }
 
 export default function Login({ onLogin, onClose }: LoginProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [roleType, setRoleType] = useState<'citizen' | 'official'>('citizen');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [officialId, setOfficialId] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -42,38 +40,23 @@ export default function Login({ onLogin, onClose }: LoginProps) {
     }
   };
 
-  const generateGovId = () => {
-    const random10 = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    setOfficialId(random10);
-  };
-
-  // 2. Supabase Email/Password (Sign In or Sign Up)
+  // 2. Supabase Email/Password (Citizen Sign In or Sign Up)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
     setSuccessMsg('');
 
-    // Validate 10-digit Government ID for Officials
-    if (roleType === 'official') {
-      if (!officialId || !/^\d{10}$/.test(officialId.trim())) {
-        setErrorMsg('Government ID must be exactly 10 digits (e.g. 9845120345).');
-        setLoading(false);
-        return;
-      }
-    }
-
     try {
       if (mode === 'signup') {
-        // Sign Up with Supabase
+        // Citizen Sign Up with Supabase
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
             data: {
-              full_name: roleType === 'official' ? (name || `Official ${officialId}`) : name,
-              role: roleType,
-              official_id: roleType === 'official' ? officialId.trim() : undefined,
+              full_name: name.trim() || 'Citizen User',
+              role: 'citizen',
             }
           }
         });
@@ -89,14 +72,13 @@ export default function Login({ onLogin, onClose }: LoginProps) {
         if (data.session) {
           setSuccessMsg('Account created & logged in successfully!');
           setTimeout(() => {
-            onLogin(roleType, data.user);
+            onLogin('citizen', data.user);
           }, 800);
         } else {
-          // Explicit confirmation email sent notification as requested
           setSuccessMsg('Confirmation email sent! Please check your email inbox to verify and activate your account.');
         }
       } else {
-        // Sign In with Supabase
+        // Citizen Sign In with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password
@@ -114,23 +96,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           return;
         }
 
-        // Verify Government ID if logging in as Official
-        if (roleType === 'official') {
-          const registeredId = data.user?.user_metadata?.official_id;
-          if (registeredId && registeredId !== officialId.trim()) {
-            await supabase.auth.signOut();
-            setErrorMsg(`Government ID verification failed. The provided 10-digit ID does not match this official account.`);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const userRole = (data.user?.user_metadata?.role as 'citizen' | 'official') || 
-                         (email.toLowerCase().includes('gov') ? 'official' : roleType);
-
         setSuccessMsg('Signed in successfully!');
         setTimeout(() => {
-          onLogin(userRole, data.user);
+          onLogin('citizen', data.user);
         }, 500);
       }
     } catch (err: any) {
@@ -148,15 +116,14 @@ export default function Login({ onLogin, onClose }: LoginProps) {
     }
   };
 
-  // 3. Quick Demo Bypass for Hackathon Judges & Offline Evaluation
-  const handleQuickDemo = (role: 'citizen' | 'official') => {
-    onLogin(role, {
-      id: role === 'official' ? 'gov-demo-user' : 'citizen-demo-user',
-      email: role === 'official' ? 'official@mplads.gov.in' : 'citizen@demo.org',
+  // 3. Quick Citizen Demo for Hackathon Evaluation
+  const handleQuickDemo = () => {
+    onLogin('citizen', {
+      id: 'citizen-demo-user',
+      email: 'citizen@nirmaan.org',
       user_metadata: {
-        full_name: role === 'official' ? 'Inspector R. K. Sharma' : 'Ramesh Kumar (Citizen)',
-        official_id: role === 'official' ? '1092837465' : undefined,
-        role
+        full_name: 'Ramesh Kumar (Citizen)',
+        role: 'citizen'
       }
     });
   };
@@ -180,10 +147,10 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             </div>
           </div>
           <h2 className="text-center text-2xl font-black text-gray-900 tracking-tight">
-            Nirmaan Watch
+            Citizen Login
           </h2>
           <p className="mt-1 text-center text-xs text-gray-500 mb-5">
-            Transparent MPLADS fund monitoring & civic accountability
+            Access public funds monitoring, ongoing works & citizen reviews
           </p>
 
           {/* Google OAuth Button */}
@@ -227,34 +194,6 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             </button>
           </div>
 
-          {/* Role selector */}
-          <div className="flex justify-center space-x-2 mb-4">
-            <button
-              type="button"
-              onClick={() => setRoleType('citizen')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-medium border transition-all ${
-                roleType === 'citizen'
-                  ? 'bg-blue-50 border-blue-300 text-blue-800 shadow-sm'
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <User size={14} />
-              <span>Normal Citizen</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setRoleType('official')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-medium border transition-all ${
-                roleType === 'official'
-                  ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm'
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <ShieldCheck size={14} />
-              <span>Gov Official</span>
-            </button>
-          </div>
-
           {/* Alerts */}
           {errorMsg && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex flex-col gap-1.5">
@@ -293,7 +232,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             {mode === 'signup' && (
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  {roleType === 'official' ? 'Officer / Authority Name' : 'Full Name'}
+                  Full Name
                 </label>
                 <div className="relative rounded-lg shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -304,51 +243,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder={roleType === 'official' ? 'e.g. Ramesh Chandra (DRDA)' : 'e.g. Rahul Sharma'}
+                    placeholder="e.g. Rahul Sharma"
                     className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
-                </div>
-              </div>
-            )}
-
-            {roleType === 'official' && (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-medium text-gray-700">
-                    10-Digit Government ID <span className="text-amber-600 font-bold">*</span>
-                  </label>
-                  {mode === 'signup' && (
-                    <button
-                      type="button"
-                      onClick={generateGovId}
-                      className="text-[11px] text-amber-700 hover:text-amber-900 font-semibold underline"
-                    >
-                      Auto-Generate ID
-                    </button>
-                  )}
-                </div>
-                <div className="relative rounded-lg shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <ShieldCheck size={15} />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    maxLength={10}
-                    value={officialId}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                      setOfficialId(digits);
-                    }}
-                    placeholder={mode === 'signup' ? 'Create 10-digit ID (e.g. 9845120345)' : 'Enter your 10-digit Gov ID'}
-                    className="pl-9 block w-full text-xs font-mono tracking-wider border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div className="flex justify-between items-center mt-1 text-[10px] text-gray-500">
-                  <span>{mode === 'signup' ? 'Created during registration for official verification' : 'Registered 10-digit Government ID'}</span>
-                  <span className={officialId.length === 10 ? 'text-emerald-600 font-bold' : 'text-gray-400 font-mono'}>
-                    {officialId.length}/10 digits
-                  </span>
                 </div>
               </div>
             )}
@@ -364,7 +261,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={roleType === 'official' ? 'officer@nic.in' : 'citizen@example.com'}
+                  placeholder="citizen@example.com"
                   className="pl-9 block w-full text-xs border border-gray-300 rounded-lg py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
@@ -390,11 +287,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl shadow-md text-xs font-semibold text-white transition-all active:scale-[0.99] disabled:opacity-60 ${
-                roleType === 'official'
-                  ? 'bg-amber-600 hover:bg-amber-700'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl shadow-md text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-[0.99] disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -403,7 +296,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                 </>
               ) : (
                 <>
-                  <span>{mode === 'signup' ? 'Create Supabase Account' : 'Sign In with Supabase'}</span>
+                  <span>{mode === 'signup' ? 'Create Citizen Account' : 'Sign In as Citizen'}</span>
                   <ArrowRight size={15} />
                 </>
               )}
@@ -414,24 +307,16 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           <div className="mt-5 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-semibold uppercase text-gray-400 tracking-wider">Instant Demo Mode</span>
-              <span className="text-[10px] text-gray-400">1-click hackathon access</span>
+              <span className="text-[10px] text-gray-400">1-click citizen access</span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('citizen')}
-                className="py-1.5 px-2 bg-gray-50 hover:bg-blue-50 text-blue-700 border border-gray-200 hover:border-blue-200 rounded-lg text-xs font-medium transition-colors text-center"
-              >
-                Quick Citizen
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('official')}
-                className="py-1.5 px-2 bg-gray-50 hover:bg-amber-50 text-amber-700 border border-gray-200 hover:border-amber-200 rounded-lg text-xs font-medium transition-colors text-center"
-              >
-                Quick Gov Official
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleQuickDemo}
+              className="w-full py-2 px-3 bg-gray-50 hover:bg-blue-50 text-blue-700 border border-gray-200 hover:border-blue-200 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              <User size={15} />
+              <span>Quick Citizen Demo Access</span>
+            </button>
           </div>
 
         </div>
