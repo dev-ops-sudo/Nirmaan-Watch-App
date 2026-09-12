@@ -125,7 +125,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
   return (
     <div className="fixed inset-0 bg-zinc-950/70 backdrop-blur-md z-50 flex flex-col justify-center items-center p-4 sm:p-6 animate-in fade-in duration-300">
-      <div className="relative w-full max-w-[420px] bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-800/60 overflow-hidden transition-all">
+      <div className="relative w-full max-w-[480px] bg-white dark:bg-zinc-900 rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-800/60 overflow-hidden transition-all">
         
         {/* Subtle Gradient Glow Background */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-orange-500/10 to-transparent pointer-events-none"></div>
@@ -139,7 +139,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           <X size={18} strokeWidth={2.5} />
         </button>
 
-        <div className="relative pt-10 pb-8 px-6 sm:px-10 z-10">
+        <div className="relative pt-12 pb-10 px-8 sm:px-12 z-10">
           {/* Header */}
           <div className="flex flex-col items-center mb-8">
             <div className="bg-white dark:bg-zinc-950 p-3 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 mb-5">
@@ -192,15 +192,15 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {mode === 'signup' && (
-              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
+              <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <label className="block text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
                   Full Name
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
-                    <User size={16} />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                    <User size={18} />
                   </div>
                   <input
                     type="text"
@@ -208,19 +208,19 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Rahul Sharma"
-                    className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                    className="pl-11 block w-full text-[15px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                   />
                 </div>
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
+            <div className="space-y-2">
+              <label className="block text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
                 Email Address
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
-                  <Mail size={16} />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                  <Mail size={18} />
                 </div>
                 <input
                   type="email"
@@ -228,18 +228,18 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="citizen@example.com"
-                  className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                  className="pl-11 block w-full text-[15px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-[12px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
+            <div className="space-y-2">
+              <label className="block text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">
                 Password
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
-                  <Lock size={16} />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400 group-focus-within:text-orange-500 transition-colors">
+                  <Lock size={18} />
                 </div>
                 <input
                   type="password"
@@ -247,16 +247,16 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 block w-full text-[14px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
+                  className="pl-11 block w-full text-[15px] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-700/80 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:focus:border-orange-500 transition-all outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400"
                 />
               </div>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-3">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full relative overflow-hidden group flex items-center justify-center gap-2 py-3 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] text-[14px] font-bold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+                className="w-full relative overflow-hidden group flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(234,88,12,0.39)] text-[15px] font-bold text-white bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
               >
                 {loading ? (
                   <>
@@ -287,9 +287,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             type="button"
             onClick={handleGoogleOAuth} 
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 px-4 py-3 rounded-xl text-[14px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 group"
+            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 px-4 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 group"
           >
-            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" className="group-hover:scale-105 transition-transform">
+            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" className="group-hover:scale-105 transition-transform">
               <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                 <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
                 <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
