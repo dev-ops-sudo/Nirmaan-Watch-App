@@ -25,6 +25,8 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
     .map((s: string) => s[0]?.toUpperCase())
     .join('') || 'U';
 
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const isGoogle = user?.app_metadata?.provider === 'google' || user?.identities?.some((i: any) => i.provider === 'google');
   const isOfficial = role === 'official';
 
   return (
@@ -40,9 +42,13 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center text-xl font-black text-white shadow-inner">
-              {initials}
-            </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={displayName} className="w-14 h-14 rounded-2xl object-cover border-2 border-white/40 shadow-md bg-white/10" />
+            ) : (
+              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center text-xl font-black text-white shadow-inner">
+                {initials}
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-bold text-white">{displayName}</h3>
@@ -71,7 +77,7 @@ export default function ProfileModal({ user, role, isOpen, onClose, onLogout }: 
               <span className="text-gray-500 font-medium">Authentication Provider</span>
               <span className="font-semibold text-gray-800 flex items-center gap-1">
                 <CheckCircle2 size={13} className="text-emerald-600" />
-                Supabase Auth
+                {isGoogle ? 'Google OAuth' : 'Supabase Auth'}
               </span>
             </div>
 

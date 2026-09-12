@@ -22,10 +22,11 @@ export default function Login({ onLogin, onClose }: LoginProps) {
     setLoading(true);
     setErrorMsg('');
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -33,6 +34,9 @@ export default function Login({ onLogin, onClose }: LoginProps) {
         }
       });
       if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (err: any) {
       console.error('Google OAuth error:', err);
       setErrorMsg(err.message || 'Failed to start Google sign-in');
