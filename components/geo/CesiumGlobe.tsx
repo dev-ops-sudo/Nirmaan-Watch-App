@@ -61,6 +61,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
   const centroidsRef = useRef<CentroidLookup | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [viewerReady, setViewerReady] = useState(false);
   const [error, setError] = useState('');
   const [mapMode, setMapMode] = useState<'standard' | 'satellite'>(() => {
     if (typeof window !== 'undefined') {
@@ -93,8 +94,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
           navigationHelpButton: false,
           // baseLayer:false prevents Ion-dependent default imagery
           baseLayer: false,
-          requestRenderMode: true,
-          maximumRenderTimeChange: Infinity,
+          requestRenderMode: false,
         });
 
         // Flat terrain - prevents Ion terrain requests that crash without a token
@@ -117,30 +117,25 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
           destination: Cesium.Cartesian3.fromDegrees(82, 22, 4_500_000),
         });
 
-        // Data source with clustering
+        // Data source - clustering disabled so every point remains permanently visible at all zoom levels
         const ds = new Cesium.CustomDataSource('mplads-works');
-        ds.clustering.enabled = true;
-        ds.clustering.pixelRange = 50;
-        ds.clustering.minimumClusterSize = 3;
-
-        ds.clustering.clusterEvent.addEventListener(
-          (clusteredEntities: any[], cluster: any) => {
-            cluster.label.show = true;
-            cluster.label.text = String(clusteredEntities.length);
-            cluster.label.font = '12px Inter, system-ui, sans-serif';
-            cluster.label.fillColor = Cesium.Color.WHITE;
-            cluster.label.outlineColor = Cesium.Color.BLACK;
-            cluster.label.outlineWidth = 2;
-            cluster.label.style = Cesium.LabelStyle.FILL_AND_OUTLINE;
-            cluster.label.verticalOrigin = Cesium.VerticalOrigin.CENTER;
-            cluster.billboard.show = true;
-            cluster.billboard.color = new Cesium.Color(0.23, 0.51, 0.96, 0.88);
-            cluster.billboard.width = 38;
-            cluster.billboard.height = 38;
-          }
-        );
-
+        ds.clustering.enabled = false;
         await viewer.dataSources.add(ds);
+
+        // Configure camera controller for smooth zooming and gestures
+        const controller = viewer.scene.screenSpaceCameraController;
+        controller.enableZoom = true;
+        controller.enableRotate = true;
+        controller.enableTranslate = true;
+        controller.enableTilt = true;
+        controller.enableLook = false;
+        controller.zoomEventTypes = [
+          Cesium.CameraEventType.RIGHT_DRAG,
+          Cesium.CameraEventType.WHEEL,
+          Cesium.CameraEventType.PINCH,
+        ];
+        controller.minimumZoomDistance = 15_000;
+        controller.maximumZoomDistance = 25_000_000;
 
         // Click handler
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -155,9 +150,33 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
           }
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+        // Trackpad pinch-to-zoom (Chrome / Edge / Safari trackpads trigger wheel with ctrlKey=true)
+        const container = containerRef.current;
+        const handleWheel = (e: WheelEvent) => {
+          if (e.ctrlKey) {
+            e.preventDefault();
+            if (!viewerRef.current || viewerRef.current.isDestroyed()) return;
+            const camera = viewerRef.current.camera;
+            const height = camera.positionCartographic?.height || 4_000_000;
+            // deltaY < 0 means pinch out (zoom in); deltaY > 0 means pinch in (zoom out)
+            const factor = Math.min(Math.max(Math.abs(e.deltaY) * 0.005, 0.02), 0.35);
+            if (e.deltaY < 0 && height > 20_000) {
+              camera.zoomIn(height * factor);
+            } else if (e.deltaY > 0 && height < 25_000_000) {
+              camera.zoomOut(height * factor);
+            }
+          }
+        };
+        container.addEventListener('wheel', handleWheel, { passive: false });
+
+        (container as any)._cleanupPinch = () => {
+          container.removeEventListener('wheel', handleWheel);
+        };
+
         viewerRef.current = viewer;
         dsRef.current = ds;
         handlerRef.current = handler;
+        setViewerReady(true);
         setLoading(false);
       } catch (e) {
         if (!dead) {
@@ -169,6 +188,10 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
 
     return () => {
       dead = true;
+      setViewerReady(false);
+      if (containerRef.current && (containerRef.current as any)._cleanupPinch) {
+        (containerRef.current as any)._cleanupPinch();
+      }
       handlerRef.current?.destroy();
       if (viewerRef.current && !viewerRef.current.isDestroyed()) {
         viewerRef.current.destroy();
@@ -180,6 +203,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
 
   /* ── 2. Swap imagery when mapMode changes ── */
   useEffect(() => {
+    if (!viewerReady) return;
     const viewer = viewerRef.current;
     if (!viewer || viewer.isDestroyed()) return;
     const Cesium = (window as any).Cesium;
@@ -210,10 +234,11 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
       layers.addImageryProvider(osmProvider(Cesium), 0);
     }
     viewer.scene.requestRender();
-  }, [mapMode]);
+  }, [mapMode, viewerReady]);
 
-  /* ── 3. Update markers when works / mapMode changes ── */
+  /* ── 3. Update markers when works / mapMode / viewerReady changes ── */
   useEffect(() => {
+    if (!viewerReady) return;
     const ds = dsRef.current;
     const centroids = centroidsRef.current;
     if (!ds || !centroids) return;
@@ -227,38 +252,48 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
     for (const [, group] of groups) {
       const repr = group[0];
       const status = dominantStatus(group);
-      const color = cesiumColor(Cesium, status, isSat);
-      const size = Math.min(22, 7 + Math.log2(group.length + 1) * 3);
+      const isCoarse = repr.geoPrecision === 'state';
+      let color = cesiumColor(Cesium, status, isSat);
+      if (isCoarse) {
+        // Visually distinguish coarse fallback (state centroid) with lower opacity
+        color = color.withAlpha(isSat ? 0.6 : 0.45);
+      }
+      const size = Math.min(24, Math.max(10, 8 + Math.log2(group.length + 1) * 2.5));
 
       const entity = ds.entities.add({
         position: Cesium.Cartesian3.fromDegrees(repr.resolvedLng, repr.resolvedLat),
         point: {
           pixelSize: size,
           color,
-          outlineColor: isSat ? Cesium.Color.WHITE.withAlpha(0.9) : Cesium.Color.WHITE.withAlpha(0.7),
-          outlineWidth: isSat ? 2.5 : 1.5,
+          outlineColor: isCoarse
+            ? Cesium.Color.fromCssColorString('rgba(203, 213, 225, 0.6)')
+            : (isSat ? Cesium.Color.WHITE.withAlpha(0.95) : Cesium.Color.WHITE.withAlpha(0.85)),
+          outlineWidth: isCoarse ? 1.5 : (isSat ? 2.5 : 2),
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          scaleByDistance: new Cesium.NearFarScalar(5e5, 1.2, 8e6, 0.6),
+          scaleByDistance: new Cesium.NearFarScalar(2e5, 1.2, 2.5e7, 0.75),
         },
         label: group.length > 1
           ? {
               text: String(group.length),
-              font: '11px Inter, system-ui, sans-serif',
+              font: 'bold 11px Inter, system-ui, sans-serif',
               fillColor: Cesium.Color.WHITE,
               outlineColor: Cesium.Color.BLACK,
               outlineWidth: 2,
               style: Cesium.LabelStyle.FILL_AND_OUTLINE,
               pixelOffset: new Cesium.Cartesian2(0, -size - 6),
-              scaleByDistance: new Cesium.NearFarScalar(5e5, 1.0, 8e6, 0.4),
+              scaleByDistance: new Cesium.NearFarScalar(2e5, 1.0, 2e7, 0.5),
               disableDepthTestDistance: Number.POSITIVE_INFINITY,
               showBackground: true,
-              backgroundColor: new Cesium.Color(0, 0, 0, 0.55),
+              backgroundColor: new Cesium.Color(0, 0, 0, 0.6),
               backgroundPadding: new Cesium.Cartesian2(4, 2),
             }
           : undefined,
       });
 
-      // Attach work data for click handling
+      // Attach work data and base styling for click handling & highlighting
+      (entity as any)._baseSize = size;
+      (entity as any)._baseOutlineColor = entity.point?.outlineColor;
+      (entity as any)._baseOutlineWidth = isCoarse ? 1 : (isSat ? 2.5 : 1.5);
       if (group.length === 1) {
         (entity as any)._singleWork = group[0];
       } else {
@@ -268,15 +303,32 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
 
     const viewer = viewerRef.current;
     if (viewer && !viewer.isDestroyed()) viewer.scene.requestRender();
-  }, [works, mapMode]);
+  }, [works, mapMode, viewerReady]);
 
-  /* ── 4. FlyTo on external selection ── */
+  /* ── 4. FlyTo and Highlight on selection ── */
   useEffect(() => {
-    if (!selectedId) return;
+    if (!viewerReady) return;
     const viewer = viewerRef.current;
+    const ds = dsRef.current;
     const centroids = centroidsRef.current;
-    if (!viewer || viewer.isDestroyed() || !centroids) return;
+    if (!viewer || viewer.isDestroyed() || !ds || !centroids) return;
     const Cesium = (window as any).Cesium;
+    if (!Cesium) return;
+
+    // Reset previous highlight
+    for (const entity of ds.entities.values) {
+      if ((entity as any)._isHighlighted && entity.point) {
+        (entity as any)._isHighlighted = false;
+        entity.point.pixelSize = (entity as any)._baseSize || 12;
+        entity.point.outlineColor = (entity as any)._baseOutlineColor;
+        entity.point.outlineWidth = (entity as any)._baseOutlineWidth || 1.5;
+      }
+    }
+
+    if (!selectedId) {
+      viewer.scene.requestRender();
+      return;
+    }
 
     const w = works.find(w => w.id === selectedId);
     if (!w) return;
@@ -285,17 +337,61 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
     if (!resolved.length) return;
     const r = resolved[0];
 
+    // Highlight matching entity
+    for (const entity of ds.entities.values) {
+      const match = entity._singleWork?.id === selectedId ||
+        entity._groupWorks?.some((gw: Work) => gw.id === selectedId);
+      if (match && entity.point) {
+        (entity as any)._isHighlighted = true;
+        entity.point.pixelSize = Math.max(((entity as any)._baseSize || 12) * 1.5, 18);
+        entity.point.outlineColor = Cesium.Color.fromCssColorString('#f97316'); // Bright saffron highlight
+        entity.point.outlineWidth = 4;
+        break;
+      }
+    }
+
+    // Smooth flyTo without jarring jump if camera is already close
+    const carto = viewer.camera.positionCartographic;
+    const curLat = Cesium.Math.toDegrees(carto.latitude);
+    const curLng = Cesium.Math.toDegrees(carto.longitude);
+    const dLat = Math.abs(curLat - r.resolvedLat);
+    const dLng = Math.abs(curLng - r.resolvedLng);
+    const isNearby = dLat < 2 && dLng < 2 && carto.height < 600_000;
+
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(r.resolvedLng, r.resolvedLat, 200_000),
-      duration: 1.5,
+      destination: Cesium.Cartesian3.fromDegrees(r.resolvedLng, r.resolvedLat, isNearby ? carto.height : 250_000),
+      duration: isNearby ? 0.8 : 1.5,
     });
-  }, [selectedId, works]);
+  }, [selectedId, works, viewerReady]);
 
   /* ── Cluster popup selection ── */
   const handleClusterSelect = useCallback((w: Work) => {
     setClusterWorks(null);
     onSelect(w);
   }, [onSelect]);
+
+  /* ── Zoom In / Zoom Out actions ── */
+  const handleZoomIn = useCallback(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed()) return;
+    const camera = viewer.camera;
+    const height = camera.positionCartographic?.height || 4_000_000;
+    if (height > 20_000) {
+      camera.zoomIn(height * 0.35);
+      viewer.scene.requestRender();
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed()) return;
+    const camera = viewer.camera;
+    const height = camera.positionCartographic?.height || 4_000_000;
+    if (height < 25_000_000) {
+      camera.zoomOut(height * 0.35);
+      viewer.scene.requestRender();
+    }
+  }, []);
 
   /* ── Render ── */
   return (
@@ -323,6 +419,26 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
       {!loading && !error && (
         <>
           <MapStyleToggle mode={mapMode} onChange={setMapMode} />
+          <div className="cesium-zoom-controls" aria-label="Zoom controls">
+            <button
+              type="button"
+              className="cesium-zoom-btn"
+              onClick={handleZoomIn}
+              title="Zoom in (Pinch out)"
+              aria-label="Zoom in"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              className="cesium-zoom-btn"
+              onClick={handleZoomOut}
+              title="Zoom out (Pinch in)"
+              aria-label="Zoom out"
+            >
+              −
+            </button>
+          </div>
           <GeoLegend satellite={mapMode === 'satellite'} />
           <div className="cesium-count" aria-live="polite">
             {works.length.toLocaleString('en-IN')} works mapped

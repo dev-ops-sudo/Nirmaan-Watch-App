@@ -622,11 +622,39 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
                   <div className="panel-heading">
                     <div>
                       <h2>Geo Intelligence <small className="hindi-section" lang="hi">भौगोलिक कवरेज</small></h2>
-                      <p>{count(filtered.length)} works · constituency-level resolution</p>
+                      <p>{count(filtered.length)} works · constituency-level resolution · approximate</p>
                     </div>
                   </div>
                   <CesiumGlobe works={filtered} onSelect={w=>setSelected(w)} selectedId={selected?.id}/>
                 </section>
+
+                <div className="insight-note">
+                  <Building2 size={24}/>
+                  <div>
+                    <strong>Location precision & ground truth</strong>
+                    <p>Coordinates are resolved to constituency or state centroids using the supplied CONSTITUENCY and STATE fields. STATE reflects MP affiliation or administrative recording. Markers tagged as approximate are positioned at geographic centroids, not physical survey addresses.</p>
+                  </div>
+                </div>
+
+                <section className="panel">
+                  <div className="panel-heading">
+                    <div>
+                      <h2>Projects in this geographic selection <small className="hindi-section" lang="hi">परियोजना सूची</small></h2>
+                      <span className="secondary">Showing {Math.min(filtered.length, 10)} of {count(filtered.length)} works · click any row to fly to its marker</span>
+                    </div>
+                    {filtered.length > 10 && (
+                      <button className="text-button" onClick={() => navigate('projects')}>
+                        View all {count(filtered.length)} in All Projects <ArrowRight size={16} />
+                      </button>
+                    )}
+                  </div>
+                  {table(filtered.slice(0, 10))}
+                </section>
+
+                <details className="geo-fallback-panel">
+                  <summary>Coverage confidence — allocation by state / UT</summary>
+                  {bars('Allocation by recorded state / UT', groups.states, false, s => { filter('state', s); navigate('projects'); })}
+                </details>
               </>}
 
               {view==='reports'&&<>
