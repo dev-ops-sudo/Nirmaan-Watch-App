@@ -53,7 +53,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
       if (mode === 'signup') {
         // Sign Up with Supabase
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
           options: {
             data: {
@@ -66,23 +66,39 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
         if (error) throw error;
 
+        // In Supabase, if user already exists, identities is an empty array
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          setErrorMsg('An account with this email already exists. Please switch to Sign In.');
+          return;
+        }
+
         if (data.session) {
-          setSuccessMsg('Account created & logged in!');
+          setSuccessMsg('Account created & logged in successfully!');
           setTimeout(() => {
             onLogin(roleType, data.user);
           }, 800);
         } else {
-          // If email confirmation is required by Supabase project settings
-          setSuccessMsg('Sign up successful! Please check your email for confirmation, or use Instant Demo.');
+          // Explicit confirmation email sent notification as requested
+          setSuccessMsg('Confirmation email sent! Please check your email inbox to verify and activate your account.');
         }
       } else {
         // Sign In with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim(),
           password
         });
 
-        if (error) throw error;
+        if (error) {
+          const msg = (error.message || '').toLowerCase();
+          if (msg.includes('invalid login credentials') || msg.includes('user not found') || (error as any).status === 400) {
+            setErrorMsg('User does not exist or credentials are invalid. Please check your email or click below to create an account.');
+          } else if (msg.includes('email not confirmed')) {
+            setErrorMsg('Email not confirmed. Please check your inbox for the confirmation email sent earlier.');
+          } else {
+            setErrorMsg(error.message || 'Authentication failed. Please verify credentials.');
+          }
+          return;
+        }
 
         const userRole = (data.user?.user_metadata?.role as 'citizen' | 'official') || 
                          (email.toLowerCase().includes('gov') ? 'official' : roleType);
@@ -94,7 +110,14 @@ export default function Login({ onLogin, onClose }: LoginProps) {
       }
     } catch (err: any) {
       console.error('Supabase Auth error:', err);
-      setErrorMsg(err.message || 'Authentication failed. Please verify credentials.');
+      const msg = (err?.message || '').toLowerCase();
+      if (msg.includes('invalid login credentials') || msg.includes('user not found')) {
+        setErrorMsg('User does not exist. Please check your email or click below to create an account.');
+      } else if (msg.includes('email not confirmed')) {
+        setErrorMsg('Email not confirmed. Please check your inbox for the confirmation email.');
+      } else {
+        setErrorMsg(err.message || 'Authentication failed. Please verify credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -208,14 +231,34 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
           {/* Alerts */}
           {errorMsg && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg flex items-start gap-2">
-              <span className="font-bold">Error:</span> {errorMsg}
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex flex-col gap-1.5">
+              <div className="flex items-start gap-2">
+                <span className="font-bold shrink-0">Notice:</span>
+                <span>{errorMsg}</span>
+              </div>
+              {mode === 'signin' && (errorMsg.includes('does not exist') || errorMsg.includes('credentials')) && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('signup'); setErrorMsg(''); }}
+                  className="text-left font-bold text-blue-700 underline text-xs mt-0.5 hover:text-blue-900 flex items-center gap-1"
+                >
+                  <span>User not found? Click here to Sign Up</span>
+                  <ArrowRight size={12} />
+                </button>
+              )}
             </div>
           )}
           {successMsg && (
-            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg flex items-center gap-2">
-              <CheckCircle2 size={16} />
-              <span>{successMsg}</span>
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs rounded-xl flex items-start gap-2 shadow-xs">
+              <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <span className="font-semibold block">{successMsg}</span>
+                {successMsg.includes('Confirmation email sent') && (
+                  <span className="text-[11px] text-emerald-700 mt-1 block">
+                    Once verified in your email, switch to <strong>Sign In</strong> to access your dashboard.
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
