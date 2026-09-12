@@ -66,7 +66,7 @@ export default function LandingPage() {
       <header className="nw-header">
         <div className="nw-wrap nw-nav">
           <a href="#home" className="nw-logo" aria-label="Nirmaan AI home">
-            <span className="nw-logo-mark" style={{ borderColor: 'rgba(255,255,255,0.7)', color: '#ffffff', background: 'rgba(255,255,255,0.18)' }}><Building2 size={23} strokeWidth={1.8} /></span>
+            <span className="nw-logo-mark" style={{ borderColor: '#FF6600', color: '#FF6600' }}><Building2 size={23} strokeWidth={1.8} /></span>
             <span>Nirmaan<span className="nw-logo-ai">AI</span><small>सार्वजनिक धन · जन विकास | PUBLIC MONEY. PUBLIC PROGRESS.</small></span>
           </a>
           <nav className="nw-desktop-links" aria-label="Main navigation">{links.map(([href, label]) => <a key={href} href={href}>{label}</a>)}</nav>
