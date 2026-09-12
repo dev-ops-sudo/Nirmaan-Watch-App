@@ -1,6 +1,6 @@
 'use client';
 import { useDeferredValue, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { ArrowDownToLine, Building2, CheckCircle2, Clock, Database, ExternalLink, IndianRupee, MapPin, Search, SlidersHorizontal, Sparkles, UserCheck, Users, X } from 'lucide-react';
+import { ArrowDownToLine, ArrowRight, Building2, CheckCircle2, Clock, Database, ExternalLink, IndianRupee, MapPin, Search, ShieldCheck, SlidersHorizontal, Sparkles, UserCheck, Users, X } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +11,7 @@ import CivicBanner from './civic-banner';
 import ProjectReviews from './project-reviews';
 import ProfileModal from './profile-modal';
 import CesiumGlobe from '@/components/geo/CesiumGlobe';
+import RagAssistant from '@/components/rag-assistant';
 import WorkModal from '@/components/work-modal';
 import MpDossierModal from '@/components/mp-dossier-modal';
 import StateRagChat from '@/components/state-rag-chat';
@@ -317,6 +318,8 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
             </span>
           </div>
           <div className="top-actions">
+            <ShieldCheck size={16}/>
+            <span>Supplied dataset (60,359 works)</span>
             {role==='guest'?(
               <button onClick={onLoginRequest} className="button bg-orange-600 hover:bg-orange-700 text-white border-none ml-4 shadow-sm">
                 Login / Sign Up
@@ -354,7 +357,16 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
             </button>
           </div>
 
-
+          <div className="dataset-banner">
+            <div>
+              <span className="dataset-dot"/>
+              <strong>MPLADS Verified Dataset</strong>
+              <span>{manifest?`${count(manifest.recordCount)} works · 36 states & UTs · recommendations ${manifest.recommendedFrom} to ${manifest.recommendedTo}`:'Loading all records…'}</span>
+            </div>
+            <button className="text-button" onClick={onAdvanced}>
+              Demo & editable workspace <ArrowRight size={14}/>
+            </button>
+          </div>
 
           {/* Integrated State-Level AI RAG Chatbot */}
           <div className="projects-intelligence mb-6">
@@ -720,7 +732,17 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
         </div>
       </main>
 
-
+      {/* Floating RAG Assistant */}
+      <RagAssistant
+        selectedState={filters.state}
+        selectedLocal={filters.local}
+        selectedVillage={filters.village}
+        selectedMp={filters.mp!=='All MPs'?filters.mp:filters.mpSearch||'All MPs'}
+        onSelectWork={workId=>{
+          const found=rows.find(r=>r.id===workId);
+          if(found)setSelected(found);
+        }}
+      />
 
       {/* Work Detail Modal Card with Gemini AI Summary & Citizen Reviews */}
       <WorkModal
