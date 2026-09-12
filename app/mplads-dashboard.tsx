@@ -318,8 +318,6 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
             </span>
           </div>
           <div className="top-actions">
-            <ShieldCheck size={16}/>
-            <span>Supplied dataset (60,359 works)</span>
             {role==='guest'?(
               <button onClick={onLoginRequest} className="button bg-orange-600 hover:bg-orange-700 text-white border-none ml-4 shadow-sm">
                 Login / Sign Up
