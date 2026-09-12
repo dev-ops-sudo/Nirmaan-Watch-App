@@ -114,22 +114,22 @@ export default function Login({ onLogin, onClose }: LoginProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-md p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 sm:p-6 md:p-8 overflow-y-auto animate-in fade-in duration-300">
       <div 
-        className="relative w-full max-w-[940px] min-h-[580px] md:min-h-[630px] bg-white dark:bg-zinc-950 rounded-2xl sm:rounded-3xl shadow-2xl border border-zinc-200/90 dark:border-zinc-800 flex flex-col md:flex-row overflow-hidden my-auto"
+        className="relative w-full max-w-[1040px] min-h-[580px] md:min-h-[640px] bg-white dark:bg-zinc-950 rounded-2xl sm:rounded-3xl shadow-2xl border border-zinc-200/80 dark:border-zinc-800/90 flex flex-col md:flex-row overflow-hidden my-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Close Button (Top Right) */}
         <button 
           onClick={onClose} 
-          className="absolute top-5 right-5 z-30 p-2 rounded-full text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all focus:outline-none"
+          className="absolute top-6 right-6 z-30 p-2.5 rounded-full text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all focus:outline-none"
           aria-label="Close modal"
         >
-          <X size={19} strokeWidth={2.2} />
+          <X size={20} strokeWidth={2.2} />
         </button>
 
-        {/* LEFT SIDE: Minimal Aesthetic Editorial Image & Quote (Reference Style) */}
-        <div className="relative hidden md:flex md:w-[46%] lg:w-[44%] flex-col justify-between p-8 text-white overflow-hidden bg-zinc-900 shrink-0 select-none" style={{ paddingBottom: '40px' }}>
+        {/* LEFT SIDE: Minimal Aesthetic Editorial Image & Quote */}
+        <div className="relative hidden md:flex md:w-[46%] lg:w-[48%] flex-col justify-between p-8 md:p-10 lg:p-12 text-white overflow-hidden bg-zinc-900 shrink-0 select-none">
           {/* Background Image */}
           <img 
             src="/images/nirmaan-auth-hero.jpg" 
@@ -138,49 +138,58 @@ export default function Login({ onLogin, onClose }: LoginProps) {
           />
           
           {/* Enhanced Scrim Gradient for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-black/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/60 pointer-events-none" />
 
           {/* Top Brand Logo */}
-          <div className="relative z-10 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-md">
-              <NirmaanLogo size={18} />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-md">
+              <NirmaanLogo size={20} />
             </div>
             <div>
-              <span className="font-bold text-base tracking-tight text-white block leading-none">
+              <span className="font-bold text-lg tracking-tight text-white block leading-none">
                 Nirmaan <span className="text-orange-400">AI</span>
               </span>
-              <span className="text-[9px] text-zinc-300 font-medium tracking-wider uppercase block mt-0.5">
+              <span className="text-[10px] text-zinc-300 font-medium tracking-wider uppercase block mt-1">
                 MPLADS Monitor
               </span>
             </div>
           </div>
 
           {/* Bottom Testimonial / Public Governance Quote */}
-          <div className="relative z-10 space-y-2.5 mb-2">
-            <p className="text-base lg:text-[18px] font-semibold text-white leading-snug tracking-tight">
+          <div 
+            className="relative z-10 space-y-3"
+            style={{ paddingBottom: '3rem' }}
+          >
+            <p className="text-xl lg:text-[22px] font-semibold text-white leading-snug tracking-tight">
               &ldquo;Simply all the transparency that citizens and leaders need.&rdquo;
             </p>
-            <div>
-              <div className="text-xs sm:text-sm font-semibold text-white">
+            <div className="pt-1.5">
+              <div className="text-base font-semibold text-white">
                 Priya Sundaram
               </div>
-              <div className="text-[11px] text-zinc-300 font-normal mt-0.5">
+              <div className="text-xs text-zinc-300 font-normal mt-0.5">
                 Director of Public Infrastructure & Analytics
               </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE: Clean Minimal Authentication Form */}
-        <div className="flex-1 flex flex-col justify-center px-7 py-10 sm:px-12 lg:px-14 bg-white dark:bg-zinc-950">
-          <div className="w-full max-w-[360px] mx-auto space-y-5">
+        {/* RIGHT SIDE: Clean, Spacious, Perfectly Aligned Authentication Form */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 md:px-12 bg-white dark:bg-zinc-950 py-8">
+          <div className="w-full max-w-[390px] mx-auto my-auto flex flex-col">
             
-            {/* Header */}
-            <div className="text-center space-y-2 mb-2">
-              <h2 className="text-2xl sm:text-[27px] font-bold text-zinc-900 dark:text-zinc-50 tracking-tight leading-tight">
-                {mode === 'signin' ? 'Welcome back to Nirmaan' : 'Create your account'}
+            {/* Header: Symmetrical, spacious, clear with generous bottom margin */}
+            <div className="text-center" style={{ marginBottom: '26px' }}>
+              <h2 
+                className="text-2xl sm:text-[28px] font-bold text-zinc-900 dark:text-zinc-50 tracking-tight leading-snug"
+                style={{ marginBottom: '10px' }}
+              >
+                {mode === 'signin' ? 'Welcome back to Nirmaan' : 'Create an account'}
               </h2>
-              <p className="text-xs sm:text-[13px] text-zinc-500 dark:text-zinc-400 max-w-[300px] mx-auto leading-relaxed">
+              <p 
+                className="text-sm text-zinc-500 dark:text-zinc-400 max-w-[350px] mx-auto"
+                style={{ lineHeight: '1.6' }}
+              >
                 {mode === 'signin'
                   ? 'Monitor MPLADS allocations, civic projects, and fund analytics effortlessly.'
                   : 'Join citizens and evaluators monitoring grassroots development projects.'}
@@ -189,22 +198,34 @@ export default function Login({ onLogin, onClose }: LoginProps) {
 
             {/* Alerts */}
             {errorMsg && (
-              <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-xs rounded-xl flex items-start gap-2.5 animate-in slide-in-from-top-1">
+              <div 
+                className="p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 text-xs rounded-xl flex items-start gap-2.5 animate-in slide-in-from-top-1"
+                style={{ marginBottom: '20px' }}
+              >
                 <div className="font-medium leading-relaxed">{errorMsg}</div>
               </div>
             )}
             {successMsg && (
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs rounded-xl flex items-center gap-2.5 animate-in slide-in-from-top-1">
+              <div 
+                className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs rounded-xl flex items-center gap-2.5 animate-in slide-in-from-top-1"
+                style={{ marginBottom: '20px' }}
+              >
                 <CheckCircle2 size={16} className="shrink-0 text-emerald-600" />
                 <div className="font-medium">{successMsg}</div>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            {/* Form with spacious inputs and clear gaps */}
+            <form onSubmit={handleSubmit} className="w-full">
               {mode === 'signup' && (
-                <div className="relative border border-zinc-200 dark:border-zinc-700 focus-within:border-[#635BFF] focus-within:ring-2 focus-within:ring-[#635BFF]/20 rounded-xl px-3.5 py-2 transition-all bg-white dark:bg-zinc-900 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                  <label className="block text-[11px] font-medium text-zinc-400 dark:text-zinc-500 leading-tight">
+                <div 
+                  className="animate-in fade-in slide-in-from-bottom-2 duration-200"
+                  style={{ marginBottom: '20px' }}
+                >
+                  <label 
+                    className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 tracking-wide"
+                    style={{ marginBottom: '8px' }}
+                  >
                     Full Name
                   </label>
                   <input
@@ -213,15 +234,19 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ramesh Kumar"
-                    className="w-full text-xs sm:text-sm font-normal text-zinc-900 dark:text-white bg-transparent border-0 p-0 focus:outline-none focus:ring-0 placeholder:text-zinc-400"
+                    className="w-full px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/80 text-sm font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#FF6600] focus:ring-2 focus:ring-[#FF6600]/20 focus:bg-white dark:focus:bg-zinc-900 transition-all shadow-sm"
+                    style={{ height: '48px' }}
                   />
                 </div>
               )}
 
-              {/* Email (Inset Label matching reference) */}
-              <div className="relative border border-zinc-200 dark:border-zinc-700 focus-within:border-[#635BFF] focus-within:ring-2 focus-within:ring-[#635BFF]/20 rounded-xl px-3.5 py-2 transition-all bg-white dark:bg-zinc-900">
-                <label className="block text-[11px] font-medium text-zinc-400 dark:text-zinc-500 leading-tight">
-                  Email
+              {/* Email Input */}
+              <div style={{ marginBottom: '20px' }}>
+                <label 
+                  className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 tracking-wide"
+                  style={{ marginBottom: '8px' }}
+                >
+                  Email address
                 </label>
                 <input
                   type="email"
@@ -229,13 +254,17 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex.jordan@gmail.com"
-                  className="w-full text-xs sm:text-sm font-normal text-zinc-900 dark:text-white bg-transparent border-0 p-0 focus:outline-none focus:ring-0 placeholder:text-zinc-400"
+                  className="w-full px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/80 text-sm font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#FF6600] focus:ring-2 focus:ring-[#FF6600]/20 focus:bg-white dark:focus:bg-zinc-900 transition-all shadow-sm"
+                  style={{ height: '48px' }}
                 />
               </div>
 
-              {/* Password (Inset Label matching reference) */}
-              <div className="relative border border-zinc-200 dark:border-zinc-700 focus-within:border-[#635BFF] focus-within:ring-2 focus-within:ring-[#635BFF]/20 rounded-xl px-3.5 py-2 transition-all bg-white dark:bg-zinc-900">
-                <label className="block text-[11px] font-medium text-zinc-400 dark:text-zinc-500 leading-tight">
+              {/* Password Input */}
+              <div style={{ marginBottom: '20px' }}>
+                <label 
+                  className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 tracking-wide"
+                  style={{ marginBottom: '8px' }}
+                >
                   Password
                 </label>
                 <input
@@ -244,55 +273,58 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full text-xs sm:text-sm font-normal text-zinc-900 dark:text-white bg-transparent border-0 p-0 focus:outline-none focus:ring-0 placeholder:text-zinc-400"
+                  className="w-full px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/80 text-sm font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-[#FF6600] focus:ring-2 focus:ring-[#FF6600]/20 focus:bg-white dark:focus:bg-zinc-900 transition-all shadow-sm"
+                  style={{ height: '48px' }}
                 />
               </div>
 
-              {/* Forgot password & Remember me rows matching reference image */}
+              {/* Single Balanced Row: Remember Me & Forgot Password */}
               {mode === 'signin' && (
-                <div className="space-y-3 pt-0.5">
-                  <div>
-                    <button 
-                      type="button" 
-                      onClick={() => alert('Password reset link sent to your email address.')}
-                      className="text-xs font-semibold text-[#635BFF] hover:text-[#5851EA] dark:text-indigo-400 hover:underline outline-none"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-zinc-600 dark:text-zinc-400 select-none font-medium">
-                      Remember sign in details
-                    </span>
+                <div 
+                  className="flex items-center justify-between"
+                  style={{ marginTop: '6px', marginBottom: '22px' }}
+                >
+                  <label className="flex items-center gap-2.5 cursor-pointer select-none">
                     <button
                       type="button"
                       role="switch"
                       aria-checked={rememberMe}
                       onClick={() => setRememberMe(!rememberMe)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        rememberMe ? 'bg-[#635BFF]' : 'bg-zinc-300 dark:bg-zinc-700'
+                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none ${
+                        rememberMe ? 'bg-[#FF6600]' : 'bg-zinc-300 dark:bg-zinc-700'
                       }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                           rememberMe ? 'translate-x-5' : 'translate-x-0'
                         }`}
                       />
                     </button>
-                  </div>
+                    <span className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-medium">
+                      Remember me
+                    </span>
+                  </label>
+                  
+                  <button 
+                    type="button" 
+                    onClick={() => alert('Password reset link sent to your email address.')}
+                    className="text-xs sm:text-sm font-semibold text-[#FF6600] hover:text-[#E65100] dark:text-orange-400 hover:underline outline-none transition-colors"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
 
               {/* Primary Submit Button */}
-              <div className="pt-2">
+              <div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#635BFF] hover:bg-[#5851EA] active:scale-[0.99] disabled:opacity-70 shadow-md shadow-[#635BFF]/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full px-5 rounded-xl text-sm font-semibold text-white bg-[#FF6600] hover:bg-[#E65100] active:scale-[0.99] disabled:opacity-70 shadow-lg shadow-[#FF6600]/25 hover:shadow-xl hover:shadow-[#FF6600]/30 transition-all flex items-center justify-center gap-2"
+                  style={{ height: '48px' }}
                 >
                   {loading ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <span>{mode === 'signup' ? 'Create account' : 'Log in'}</span>
                   )}
@@ -301,11 +333,14 @@ export default function Login({ onLogin, onClose }: LoginProps) {
             </form>
 
             {/* OR Divider */}
-            <div className="relative my-3">
+            <div 
+              className="relative"
+              style={{ marginTop: '24px', marginBottom: '24px' }}
+            >
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
               </div>
-              <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-semibold">
+              <div className="relative flex justify-center text-[11px] uppercase tracking-wider font-semibold">
                 <span className="px-3 bg-white dark:bg-zinc-950 text-zinc-400">
                   OR
                 </span>
@@ -317,7 +352,8 @@ export default function Login({ onLogin, onClose }: LoginProps) {
               type="button"
               onClick={handleGoogleOAuth} 
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] hover:bg-[#E5E7EB] dark:bg-zinc-900/80 dark:hover:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold transition active:scale-[0.99] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 px-4 rounded-xl text-sm font-semibold transition-all active:scale-[0.99] disabled:opacity-50 shadow-sm"
+              style={{ height: '48px' }}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
                 <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
@@ -330,41 +366,45 @@ export default function Login({ onLogin, onClose }: LoginProps) {
               <span>Continue with Google</span>
             </button>
 
-            {/* Bottom Toggle */}
-            <div className="pt-1 text-center text-xs text-zinc-500 dark:text-zinc-400">
-              {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
-              <button 
-                type="button"
-                onClick={() => { 
-                  setMode(mode === 'signin' ? 'signup' : 'signin'); 
-                  setErrorMsg(''); 
-                  setSuccessMsg(''); 
-                }}
-                className="font-bold text-[#635BFF] hover:text-[#5851EA] dark:text-indigo-400 hover:underline outline-none inline-block ml-1"
-              >
-                {mode === 'signin' ? 'Sign up' : 'Log in'}
-              </button>
-            </div>
+            {/* Bottom Toggle & Demo Access */}
+            <div 
+              className="flex flex-col items-center text-center"
+              style={{ marginTop: '24px' }}
+            >
+              <div className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+                {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+                <button 
+                  type="button"
+                  onClick={() => { 
+                    setMode(mode === 'signin' ? 'signup' : 'signin'); 
+                    setErrorMsg(''); 
+                    setSuccessMsg(''); 
+                  }}
+                  className="font-bold text-[#FF6600] hover:text-[#E65100] dark:text-orange-400 hover:underline outline-none inline-block ml-1 transition-colors"
+                >
+                  {mode === 'signin' ? 'Sign up' : 'Log in'}
+                </button>
+              </div>
 
-            {/* Instant Guest Demo Access */}
-            <div className="pt-1 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  onLogin('citizen', {
-                    id: 'citizen-demo-user',
-                    email: 'citizen@nirmaan.org',
-                    user_metadata: {
-                      full_name: 'Ramesh Kumar',
-                      role: 'citizen'
-                    }
-                  });
-                }}
-                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                title="Instant access for review and testing"
-              >
-                <span>Explore as Guest (Instant Access)</span>
-              </button>
+              <div style={{ marginTop: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onLogin('citizen', {
+                      id: 'citizen-demo-user',
+                      email: 'citizen@nirmaan.org',
+                      user_metadata: {
+                        full_name: 'Ramesh Kumar',
+                        role: 'citizen'
+                      }
+                    });
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all"
+                  title="Instant access for review and testing"
+                >
+                  <span>Explore as Guest (Instant Access) →</span>
+                </button>
+              </div>
             </div>
 
           </div>
