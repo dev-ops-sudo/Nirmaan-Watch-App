@@ -263,7 +263,7 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
           <h2>{title}</h2>
           <span className="secondary">{byCount?'Works Count':'Allocation (INR)'}</span>
         </div>
-        <div className="source-bars flex-1 flex flex-col justify-around py-4">
+        <div className="source-bars flex-1 py-4">
           {data.length?data.map(g=>(
             <div key={g.name} className="space-y-1">
               <div className="spread text-xs">
