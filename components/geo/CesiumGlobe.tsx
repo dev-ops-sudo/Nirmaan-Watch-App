@@ -91,13 +91,23 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
           geocoder: false, homeButton: false, infoBox: false,
           sceneModePicker: false, selectionIndicator: false, timeline: false,
           navigationHelpButton: false,
-          baseLayer: new Cesium.ImageryLayer(
-            new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' })
-          ),
-          terrain: undefined,
+          // baseLayer:false prevents Ion-dependent default imagery
+          baseLayer: false,
           requestRenderMode: true,
           maximumRenderTimeChange: Infinity,
         });
+
+        // Flat terrain — prevents Ion terrain requests that crash without a token
+        viewer.scene.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+
+        // Add OSM as base layer (UrlTemplateImageryProvider is more reliable than OpenStreetMapImageryProvider)
+        viewer.imageryLayers.addImageryProvider(
+          new Cesium.UrlTemplateImageryProvider({
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            maximumLevel: 19,
+            credit: new Cesium.Credit('© OpenStreetMap contributors'),
+          })
+        );
 
         // Clean up default credits UI
         (viewer.cesiumWidget.creditContainer as HTMLElement).style.display = 'none';
@@ -180,26 +190,24 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
     while (layers.length > 0) layers.remove(layers.get(0));
 
     if (mapMode === 'satellite') {
-      try {
-        // Try Cesium Ion (requires token) → fallback to Esri World Imagery (free for dev)
-        const ionToken = Cesium.Ion.defaultAccessToken;
-        if (ionToken) {
-          Cesium.IonImageryProvider.fromAssetId(2).then((provider: any) => {
-            if (!viewer.isDestroyed()) layers.addImageryProvider(provider, 0);
-          }).catch(() => {
-            if (!viewer.isDestroyed()) addEsriSatellite(Cesium, layers);
-          });
-        } else {
-          addEsriSatellite(Cesium, layers);
+      // Esri World Imagery — free for development, no token needed
+      // Must use async fromUrl factory (constructor deprecated in CesiumJS 1.104+)
+      Cesium.ArcGisMapServerImageryProvider.fromUrl(
+        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      ).then((provider: any) => {
+        if (!viewer.isDestroyed()) {
+          layers.addImageryProvider(provider, 0);
+          viewer.scene.requestRender();
         }
-      } catch {
-        addEsriSatellite(Cesium, layers);
-      }
+      }).catch(() => {
+        // Fallback to OSM if Esri fails
+        if (!viewer.isDestroyed()) {
+          layers.addImageryProvider(osmProvider(Cesium), 0);
+          viewer.scene.requestRender();
+        }
+      });
     } else {
-      layers.addImageryProvider(
-        new Cesium.OpenStreetMapImageryProvider({ url: 'https://tile.openstreetmap.org/' }),
-        0
-      );
+      layers.addImageryProvider(osmProvider(Cesium), 0);
     }
     viewer.scene.requestRender();
   }, [mapMode]);
@@ -353,11 +361,12 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
 
 /* ── Helpers ── */
 
-function addEsriSatellite(Cesium: any, layers: any) {
-  layers.addImageryProvider(
-    new Cesium.ArcGisMapServerImageryProvider({
-      url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-    }),
-    0
-  );
+/** Reliable OSM tile provider — uses UrlTemplateImageryProvider instead of the
+ *  deprecated OpenStreetMapImageryProvider constructor. */
+function osmProvider(Cesium: any) {
+  return new Cesium.UrlTemplateImageryProvider({
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    maximumLevel: 19,
+    credit: new Cesium.Credit('© OpenStreetMap contributors'),
+  });
 }
