@@ -97,7 +97,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
           maximumRenderTimeChange: Infinity,
         });
 
-        // Flat terrain — prevents Ion terrain requests that crash without a token
+        // Flat terrain - prevents Ion terrain requests that crash without a token
         viewer.scene.terrainProvider = new Cesium.EllipsoidTerrainProvider();
 
         // Add OSM as base layer (UrlTemplateImageryProvider is more reliable than OpenStreetMapImageryProvider)
@@ -190,7 +190,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
     while (layers.length > 0) layers.remove(layers.get(0));
 
     if (mapMode === 'satellite') {
-      // Esri World Imagery — free for development, no token needed
+      // Esri World Imagery - free for development, no token needed
       // Must use async fromUrl factory (constructor deprecated in CesiumJS 1.104+)
       Cesium.ArcGisMapServerImageryProvider.fromUrl(
         'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
@@ -330,7 +330,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
         </>
       )}
 
-      {/* Cluster popup — shown when multi-work marker is clicked */}
+      {/* Cluster popup - shown when multi-work marker is clicked */}
       {clusterWorks && (
         <div className="cesium-cluster-popup">
           <div className="cesium-cluster-header">
@@ -361,7 +361,7 @@ export default function CesiumGlobe({ works, onSelect, selectedId }: Props) {
 
 /* ── Helpers ── */
 
-/** Reliable OSM tile provider — uses UrlTemplateImageryProvider instead of the
+/** Reliable OSM tile provider - uses UrlTemplateImageryProvider instead of the
  *  deprecated OpenStreetMapImageryProvider constructor. */
 function osmProvider(Cesium: any) {
   return new Cesium.UrlTemplateImageryProvider({

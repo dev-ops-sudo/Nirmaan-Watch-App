@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Nirmaan Watch | Code Crew",
     description: "Explore 60,359 supplied MPLADS works, recorded allocations, MPs and approval statuses across India.",
-    images: [{ url: "/og.png", width: 1732, height: 908, alt: "Nirmaan Watch — MPLADS development monitor" }],
+    images: [{ url: "/og.png", width: 1732, height: 908, alt: "Nirmaan Watch - MPLADS development monitor" }],
   },
   twitter: {
     card: "summary_large_image",
