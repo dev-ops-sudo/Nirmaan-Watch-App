@@ -19,7 +19,7 @@ import MpladsDashboard from './mplads-dashboard';
 import ProfileModal from './profile-modal';
 import { NirmaanLogo } from './nirmaan-logo';
 const hindiNav:Record<string,string>={overview:'अवलोकन',map:'विकास मानचित्र',projects:'सभी परियोजनाएँ',alerts:'अनियमितता समीक्षा',contractors:'ठेकेदार',feedback:'नागरिक प्रतिक्रिया',reports:'रिपोर्ट और विश्लेषण',data:'डेटा प्रबंधन'};
-const nav=[['overview','Overview',LayoutDashboard],['map','Development map',Map],['projects','All projects',FolderOpen],['alerts','Anomaly review',ShieldCheck],['contractors','Contractors',HardHat],['feedback','Citizen feedback',MessageSquare],['reports','Reports & insights',Activity],['data','Data workspace',Database]] as const;
+const nav=[['overview','Overview',LayoutDashboard],['map','Development map',Map],['projects','All projects',FolderOpen],['alerts','Anomaly review',ShieldCheck],['contractors','Contractors',HardHat],['feedback','Citizen feedback',MessageSquare],['reports','Reports & insights',Activity]] as const;
 function Picker({value,onChange,options,label}:{value:string;onChange:(v:string)=>void;options:string[];label:string}){return <Select value={value} onValueChange={onChange}><SelectTrigger className="picker" aria-label={label}><SelectValue placeholder={label}/></SelectTrigger><SelectContent>{options.map(v=><SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent></Select>;}
 function Badge({children,tone='neutral'}:{children:React.ReactNode;tone?:string}){return <span className={`badge ${tone.toLowerCase().replaceAll(' ','-')}`}>{children}</span>;}
 function Blank({title,detail,children}:{title:string;detail:string;children?:React.ReactNode}){return <div className="blank"><FolderOpen size={30}/><h3>{title}</h3><p>{detail}</p>{children}</div>;}
