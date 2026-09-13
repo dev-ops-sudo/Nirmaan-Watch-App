@@ -18,10 +18,9 @@ import {
   Clock, 
   FileText,
   User,
-  Tag,
-  Layers,
-  Database
+  AlertTriangle
 } from 'lucide-react';
+import { queryRagIntelligence } from '@/lib/rag-service';
 import { money } from '@/lib/domain';
 import { sourceCsv, type Work } from '@/lib/mplads';
 
@@ -78,19 +77,13 @@ export default function WorkModal({ work, onClose, onViewMpDossier }: WorkModalP
     try {
       const prompt = `Provide an executive development summary for MPLADS project ${work.id}: "${work.title}". Location: ${work.village || work.city || work.block || 'Local Area'}, ${work.constituency}, ${work.state}. Recommending MP: ${work.mp} (${work.house}). Allocation: INR ${work.allocation}. Status: ${work.status}. Implementing Authority: ${work.agency}. Highlight the public utility, approval status, and execution implications.`;
 
-      const res = await fetch('/api/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: prompt,
-          state: work.state,
-          mp: work.mp,
-          local: work.block || work.city || work.constituency || 'All localities'
-        })
+      const data = await queryRagIntelligence({
+        query: prompt,
+        state: work.state,
+        mp: work.mp,
+        local: work.block || work.city || work.constituency || 'All localities'
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as any;
       setAiSummary(data.answer || 'Summary generated successfully.');
     } catch (err: any) {
       setSummaryError('Could not generate AI summary at this moment. Please try again.');

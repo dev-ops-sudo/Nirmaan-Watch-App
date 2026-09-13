@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { compactMoney, money } from '@/lib/domain';
 import { sourceCsv, type Work } from '@/lib/mplads';
+import { queryRagIntelligence } from '@/lib/rag-service';
 
 interface MpDossierModalProps {
   mpName: string | null;
@@ -120,21 +121,16 @@ Portfolio Summary: ${mpWorks.length} works recommended, Total Allocation: INR ${
 Top Categories: ${stats.categories.slice(0, 4).map(c => `${c.name} (INR ${c.allocation}, ${c.count} works)`).join(', ')}.
 Analyze the MP's priority investment sectors, execution efficiency, and geographic reach across ${stats.villages} villages.`;
 
-      const res = await fetch('/api/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: prompt,
-          state: meta.state,
-          mp: mpName
-        })
+      const data = await queryRagIntelligence({
+        query: prompt,
+        state: meta.state,
+        mp: mpName,
+        works: mpWorks
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as any;
       setAiSummary(data.answer || 'Summary generated successfully.');
     } catch (err) {
-      setSummaryError('Failed to generate MP summary with Gemini. Please verify Gemini API key configuration.');
+      setSummaryError('Failed to generate MP summary. Please verify your connection or try again.');
     } finally {
       setGeneratingSummary(false);
     }

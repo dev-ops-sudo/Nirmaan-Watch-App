@@ -370,6 +370,7 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
           <div className="projects-intelligence mb-6">
             <StateRagChat
               currentState={filters.state}
+              works={rows}
               onSelectWork={workId => {
                 const found = rows.find(r => r.id === workId);
                 if (found) setSelected(found);

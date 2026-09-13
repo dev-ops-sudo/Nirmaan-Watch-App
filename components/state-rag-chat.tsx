@@ -5,8 +5,10 @@ import { Bot, Send, Sparkles, ChevronDown, ChevronUp, RefreshCw, ExternalLink, L
 
 interface StateRagChatProps {
   currentState: string;
+  works?: any[];
   onSelectWork?: (workId: string) => void;
 }
+import { queryRagIntelligence } from '@/lib/rag-service';
 
 function FormattedAiMessage({ text }: { text: string }) {
   if (!text) return null;
@@ -90,7 +92,7 @@ function FormattedAiMessage({ text }: { text: string }) {
   return <div className="rag-formatted-content">{elements}</div>;
 }
 
-export default function StateRagChat({ currentState, onSelectWork }: StateRagChatProps) {
+export default function StateRagChat({ currentState, works, onSelectWork }: StateRagChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -116,17 +118,12 @@ export default function StateRagChat({ currentState, onSelectWork }: StateRagCha
     setLoading(true);
 
     try {
-      const res = await fetch('/api/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: q,
-          state: currentState
-        })
+      const data = await queryRagIntelligence({
+        query: q,
+        state: currentState,
+        works
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as any;
       setMessages(prev => [
         ...prev,
         {

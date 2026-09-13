@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Send, Bot, Database, ShieldCheck, ArrowRight, ExternalLink, X, RefreshCw } from 'lucide-react';
 import { compactMoney, money } from '@/lib/domain';
+import { queryRagIntelligence } from '@/lib/rag-service';
 
 interface RagCitation {
   id: string;
@@ -52,24 +53,15 @@ export default function RagAssistant({
 
     setLoading(true);
     try {
-      const res = await fetch('/api/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: q,
-          state: selectedState,
-          local: selectedLocal,
-          village: selectedVillage,
-          mp: selectedMp
-        })
+      const data = await queryRagIntelligence({
+        query: q,
+        state: selectedState,
+        local: selectedLocal,
+        village: selectedVillage,
+        mp: selectedMp
       });
 
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
-      }
-
-      const data: RagResponse = await res.json();
-      setResponse(data);
+      setResponse(data as RagResponse);
       setQuery('');
     } catch (err: any) {
       console.error('RAG request error:', err);
