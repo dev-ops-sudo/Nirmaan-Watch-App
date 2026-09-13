@@ -787,7 +787,7 @@ html{scroll-behavior:smooth;scroll-padding-top:125px}
     transition:transform .35s ease, box-shadow .35s ease;
   }
   .team-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow-card); }
-  .team-avatar{
+  .team-card .team-avatar{
     width:46px; height:46px; border-radius:12px;
     background:linear-gradient(135deg, var(--navy-800), var(--navy-950));
     color:#fff; font-weight:700; font-size:16px;
