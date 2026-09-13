@@ -366,7 +366,7 @@ export default function Login({ onLogin, onClose }: LoginProps) {
               <span>Continue with Google</span>
             </button>
 
-            {/* Bottom Toggle & Demo Access */}
+            {/* Bottom Mode Toggle */}
             <div 
               className="flex flex-col items-center text-center"
               style={{ marginTop: '24px' }}
@@ -383,26 +383,6 @@ export default function Login({ onLogin, onClose }: LoginProps) {
                   className="font-bold text-[#FF6600] hover:text-[#E65100] dark:text-orange-400 hover:underline outline-none inline-block ml-1 transition-colors"
                 >
                   {mode === 'signin' ? 'Sign up' : 'Log in'}
-                </button>
-              </div>
-
-              <div style={{ marginTop: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onLogin('citizen', {
-                      id: 'citizen-demo-user',
-                      email: 'citizen@nirmaan.org',
-                      user_metadata: {
-                        full_name: 'Ramesh Kumar',
-                        role: 'citizen'
-                      }
-                    });
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all"
-                  title="Instant access for review and testing"
-                >
-                  <span>Explore as Guest (Instant Access) →</span>
                 </button>
               </div>
             </div>

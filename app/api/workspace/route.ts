@@ -4,7 +4,6 @@ import { ensureDb, getDb } from '@/db';
 import * as s from '@/db/schema';
 import { getChatGPTUser } from '@/app/chatgpt-auth';
 import { validateImport, Project } from '@/lib/domain';
-import { demoProjects, DEMO_AS_OF } from '@/lib/demo';
 import { analyze } from '@/lib/analytics';
 export const dynamic='force-dynamic';
 const now=()=>new Date().toISOString();
@@ -35,24 +34,24 @@ export async function POST(request:Request){try{
   return Response.json({ok:true,count:rows.length});
  }
  if(body.action==='feedback'){
- const p=z.object({projectId:z.string().max(80),rating:z.number().int().min(1).max(5),category:z.enum(['Quality','Delay','Safety','Accessibility','Other']),message:z.string().trim().min(10).max(2000)}).parse(body);
- const project=demoProjects.find(q=>q.id===p.projectId)||(await db.select().from(s.projects).where(eq(s.projects.id,p.projectId)))[0];if(!project)throw new Error('Project not found');
- const recent=await db.select().from(s.feedback).where(and(eq(s.feedback.author,user.email),eq(s.feedback.projectId,p.projectId))).orderBy(desc(s.feedback.createdAt)).limit(1);if(recent[0]&&Date.now()-Date.parse(recent[0].createdAt)<60000)throw new Error('Please wait a minute before submitting another report for this project.');
- const id=crypto.randomUUID();await db.batch([db.insert(s.feedback).values({...p,id,author:user.email,name:user.fullName||'Workspace member',status:'Open',response:'',createdAt:stamp}),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Feedback submitted',detail:`${p.projectId} · ${p.category}`,createdAt:stamp})]);return Response.json({ok:true,id});
+  const p=z.object({projectId:z.string().max(80),rating:z.number().int().min(1).max(5),category:z.enum(['Quality','Delay','Safety','Accessibility','Other']),message:z.string().trim().min(10).max(2000)}).parse(body);
+  const project=(await db.select().from(s.projects).where(eq(s.projects.id,p.projectId)))[0];if(!project)throw new Error('Project not found');
+  const recent=await db.select().from(s.feedback).where(and(eq(s.feedback.author,user.email),eq(s.feedback.projectId,p.projectId))).orderBy(desc(s.feedback.createdAt)).limit(1);if(recent[0]&&Date.now()-Date.parse(recent[0].createdAt)<60000)throw new Error('Please wait a minute before submitting another report for this project.');
+  const id=crypto.randomUUID();await db.batch([db.insert(s.feedback).values({...p,id,author:user.email,name:user.fullName||'Workspace member',status:'Open',response:'',createdAt:stamp}),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Feedback submitted',detail:`${p.projectId} · ${p.category}`,createdAt:stamp})]);return Response.json({ok:true,id});
  }
  if(!isAdmin)return Response.json({error:'This action requires the workspace owner.'},{status:403});
  if(body.action==='review'){
- const b=z.object({id:z.string().max(150),projectId:z.string().max(80),status:z.enum(['Open','Investigating','Resolved','Dismissed']),note:z.string().trim().min(8).max(2000)}).parse(body);
- const rows=b.projectId.startsWith('DEMO-')?demoProjects:(await db.select().from(s.projects)).map(r=>JSON.parse(r.payload) as Project);if(!analyze(rows,b.projectId.startsWith('DEMO-')?DEMO_AS_OF:stamp.slice(0,10)).some(a=>a.id===b.id&&a.projectId===b.projectId))throw new Error('Alert no longer exists. Refresh the analysis.');
- await db.batch([db.insert(s.reviews).values({...b,actor:user.email,updatedAt:stamp}).onConflictDoUpdate({target:s.reviews.id,set:{...b,actor:user.email,updatedAt:stamp}}),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Alert review updated',detail:`${b.id} → ${b.status}. ${b.note}`,createdAt:stamp})]);return Response.json({ok:true});
+  const b=z.object({id:z.string().max(150),projectId:z.string().max(80),status:z.enum(['Open','Investigating','Resolved','Dismissed']),note:z.string().trim().min(8).max(2000)}).parse(body);
+  const rows=(await db.select().from(s.projects)).map(r=>JSON.parse(r.payload) as Project);if(!analyze(rows,stamp.slice(0,10)).some(a=>a.id===b.id&&a.projectId===b.projectId))throw new Error('Alert no longer exists. Refresh the analysis.');
+  await db.batch([db.insert(s.reviews).values({...b,actor:user.email,updatedAt:stamp}).onConflictDoUpdate({target:s.reviews.id,set:{...b,actor:user.email,updatedAt:stamp}}),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Alert review updated',detail:`${b.id} → ${b.status}. ${b.note}`,createdAt:stamp})]);return Response.json({ok:true});
  }
  if(body.action==='respond'){
- const b=z.object({id:z.string(),status:z.enum(['Open','In review','Resolved']),response:z.string().trim().min(5).max(2000)}).parse(body);const [existing]=await db.select().from(s.feedback).where(eq(s.feedback.id,b.id));if(!existing)throw new Error('Feedback not found');
- await db.batch([db.update(s.feedback).set({status:b.status,response:b.response}).where(eq(s.feedback.id,b.id)),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Feedback response',detail:`${existing.projectId} · ${b.status}: ${b.response}`,createdAt:stamp})]);return Response.json({ok:true});
+  const b=z.object({id:z.string(),status:z.enum(['Open','In review','Resolved']),response:z.string().trim().min(5).max(2000)}).parse(body);const [existing]=await db.select().from(s.feedback).where(eq(s.feedback.id,b.id));if(!existing)throw new Error('Feedback not found');
+  await db.batch([db.update(s.feedback).set({status:b.status,response:b.response}).where(eq(s.feedback.id,b.id)),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Feedback response',detail:`${existing.projectId} · ${b.status}: ${b.response}`,createdAt:stamp})]);return Response.json({ok:true});
  }
  if(body.action==='update'){
- const b=z.object({id:z.string(),progress:z.number().min(0).max(100).nullable(),spent:z.number().min(0).max(1e12),released:z.number().min(0).max(1e12),revised:z.number().min(0).max(1e12).nullable(),status:z.enum(['Planned','Ongoing','Delayed','Completed']),dueDate:z.string(),note:z.string().trim().min(8).max(2000)}).parse(body);const [old]=await db.select().from(s.projects).where(eq(s.projects.id,b.id));if(!old)throw new Error('Import a project before editing it. Demo records are read-only.');const original=JSON.parse(old.payload);const [p]=validateImport([{...original,...b,updatedAt:stamp.slice(0,10)}]);
- await db.batch([db.update(s.projects).set({payload:JSON.stringify(p),updatedAt:stamp}).where(eq(s.projects.id,p.id)),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Project updated',detail:`${p.id}: ${b.note}. Before: ${JSON.stringify({progress:original.progress,spent:original.spent,released:original.released,revised:original.revised,status:original.status,dueDate:original.dueDate})}. After: ${JSON.stringify(b)}`,createdAt:stamp})]);return Response.json({ok:true});
+  const b=z.object({id:z.string(),progress:z.number().min(0).max(100).nullable(),spent:z.number().min(0).max(1e12),released:z.number().min(0).max(1e12),revised:z.number().min(0).max(1e12).nullable(),status:z.enum(['Planned','Ongoing','Delayed','Completed']),dueDate:z.string(),note:z.string().trim().min(8).max(2000)}).parse(body);const [old]=await db.select().from(s.projects).where(eq(s.projects.id,b.id));if(!old)throw new Error('Project not found in imported dataset.');const original=JSON.parse(old.payload);const [p]=validateImport([{...original,...b,updatedAt:stamp.slice(0,10)}]);
+  await db.batch([db.update(s.projects).set({payload:JSON.stringify(p),updatedAt:stamp}).where(eq(s.projects.id,p.id)),db.insert(s.audit).values({id:crypto.randomUUID(),actor:user.email,action:'Project updated',detail:`${p.id}: ${b.note}. Before: ${JSON.stringify({progress:original.progress,spent:original.spent,released:original.released,revised:original.revised,status:original.status,dueDate:original.dueDate})}. After: ${JSON.stringify(b)}`,createdAt:stamp})]);return Response.json({ok:true});
  }
  throw new Error('Unknown action');
  }catch(e){const message=e instanceof z.ZodError?e.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('; '):e instanceof Error?e.message:'Request failed';console.error('workspace write',e);return Response.json({error:message},{status:message.startsWith('Sign in')?401:400});}}

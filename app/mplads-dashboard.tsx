@@ -362,7 +362,7 @@ export default function MpladsDashboard({onAdvanced,role='official',user,onLogou
               <span>{manifest?`${count(manifest.recordCount)} works · 36 states & UTs · recommendations ${manifest.recommendedFrom} to ${manifest.recommendedTo}`:'Loading all records…'}</span>
             </div>
             <button className="text-button" onClick={onAdvanced}>
-              Demo & editable workspace <ArrowRight size={14}/>
+              Imported records workspace <ArrowRight size={14}/>
             </button>
           </div>
 
